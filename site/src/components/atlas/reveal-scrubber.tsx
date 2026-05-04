@@ -49,7 +49,7 @@ export function RevealScrubber() {
           if (revealUpTo >= total - 1) replay();
           else togglePlayReveal();
         }}
-        style={{ color: "var(--c1)", background: "none", border: "none", cursor: "pointer", fontSize: 14, fontFamily: "var(--mono)" }}
+        style={{ color: "var(--c1)", background: "none", border: "none", cursor: "pointer", fontSize: 16, fontFamily: "var(--mono)" }}
       >
         {playReveal && revealUpTo < total - 1 ? "❚❚" : "▶"}
       </button>
@@ -77,13 +77,13 @@ export function RevealScrubber() {
 
       <button
         onClick={replay}
-        style={{ color: "var(--ink-4)", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+        style={{ color: "var(--ink-4)", background: "none", border: "none", cursor: "pointer", fontSize: 16 }}
         aria-label="Replay"
       >
         ⟲
       </button>
 
-      <span style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--ink-3)", whiteSpace: "nowrap", minWidth: 170 }}>
+      <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--ink-3)", whiteSpace: "nowrap", minWidth: 170 }}>
         {currentLabel}
       </span>
     </div>

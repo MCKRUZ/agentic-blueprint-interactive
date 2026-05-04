@@ -24,13 +24,13 @@ html {
   --c5: #4ADE80;
   --signal: #F87171;
   --ink-l01: #67E8F9;
-  --ink-l02: #38BDF8;
+  --ink-l02: #60A5FA;
   --ink-l03: #818CF8;
-  --ink-l04: #A78BFA;
-  --ink-l05: #C084FC;
-  --ink-l06: #E879F9;
+  --ink-l04: #34D399;
+  --ink-l05: #A78BFA;
+  --ink-l06: #FB923C;
   --ink-l07: #F472B6;
-  --ink-l08: #FB7185;
+  --ink-l08: #2DD4BF;
   --ink-l09: #FBBF24;
   --ink-l10: #F87171;
   --type-scale: 1.18;
@@ -52,6 +52,22 @@ html {
   --ink-2:   #2C3D60;
   --ink-3:   #5C6B85;
   --ink-4:   #93A0B7;
+  --c1: #0891B2;
+  --c2: #7C3AED;
+  --c3: #DB2777;
+  --c4: #D97706;
+  --c5: #16A34A;
+  --signal: #DC2626;
+  --ink-l01: #0E7490;
+  --ink-l02: #2563EB;
+  --ink-l03: #4338CA;
+  --ink-l04: #059669;
+  --ink-l05: #7C3AED;
+  --ink-l06: #EA580C;
+  --ink-l07: #BE185D;
+  --ink-l08: #0D9488;
+  --ink-l09: #B45309;
+  --ink-l10: #DC2626;
 }
 
 * { box-sizing: border-box; }
@@ -103,6 +119,18 @@ body::after {
   pointer-events: none;
   z-index: 0;
   animation: starshift 60s linear infinite;
+}
+
+[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 90% 60% at 20% 10%, rgba(14, 116, 144, 0.06), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 90%, rgba(109, 40, 217, 0.06), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(190, 24, 93, 0.04), transparent 60%),
+    var(--bg-0);
+}
+
+[data-theme="light"] body::before {
+  opacity: 0.08;
 }
 
 [data-theme="light"] body::after { display: none; }

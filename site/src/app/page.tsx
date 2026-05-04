@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAppStore, hydrateFromURL } from "@/store/app-store";
 import { LAYERS } from "@/data/layers";
+import "@/data/enrichment";
 import { Topbar } from "@/components/topbar";
 import { StatRail } from "@/components/stat-rail";
 import { AtlasCanvas } from "@/components/atlas/atlas-canvas";

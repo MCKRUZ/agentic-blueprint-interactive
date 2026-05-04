@@ -25,7 +25,7 @@ export const REGIONS: Record<string, Region> = {
   governance:    { x: 360, y: 910, w: 600,  h: 110, cols: 5, label: "top" },
 };
 
-const PAD = { x: 16, top: 30, bottom: 16 };
+const PAD = { x: 12, top: 12, bottom: 12 };
 
 export interface CompBox {
   x: number;

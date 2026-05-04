@@ -44,12 +44,12 @@ export function ComponentBox({ box, ink, isHovered, onOpen, onHover }: Component
         y={box.y}
         width={box.w}
         height={box.h}
-        rx={4}
+        rx={5}
         fill={ink}
-        fillOpacity={isHovered ? 0.15 : 0.08}
+        fillOpacity={isHovered ? 0.22 : 0.12}
         stroke={ink}
-        strokeOpacity={isHovered ? 0.5 : 0.2}
-        strokeWidth={1}
+        strokeOpacity={isHovered ? 0.6 : 0.35}
+        strokeWidth={1.5}
         style={{
           transition: "fill-opacity 0.2s, stroke-opacity 0.2s, transform 0.2s",
           transformOrigin: `${box.x + box.w / 2}px ${box.y + box.h / 2}px`,
@@ -63,9 +63,10 @@ export function ComponentBox({ box, ink, isHovered, onOpen, onHover }: Component
         dominantBaseline="central"
         style={{
           fontFamily: "var(--mono)",
-          fontSize: Math.min(9, box.w / (box.comp.name.length * 0.6)),
+          fontSize: Math.min(13, box.w / (box.comp.name.length * 0.55)),
+          fontWeight: 500,
           fill: ink,
-          opacity: isHovered ? 1 : 0.8,
+          opacity: isHovered ? 1 : 0.9,
           pointerEvents: "none",
           userSelect: "none",
         }}

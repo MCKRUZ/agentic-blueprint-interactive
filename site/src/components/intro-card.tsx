@@ -27,7 +27,7 @@ export function IntroCard() {
         <span
           style={{
             fontFamily: "var(--mono)",
-            fontSize: 10,
+            fontSize: 12,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
             color: "var(--ink-3)",
@@ -37,7 +37,7 @@ export function IntroCard() {
         </span>
         <button
           onClick={() => setDismissed(true)}
-          style={{ background: "none", border: "none", color: "var(--ink-4)", cursor: "pointer", fontSize: 16 }}
+          style={{ background: "none", border: "none", color: "var(--ink-4)", cursor: "pointer", fontSize: 18 }}
         >
           ×
         </button>
@@ -56,7 +56,7 @@ export function IntroCard() {
         How an agentic platform actually works.
       </h1>
 
-      <p style={{ fontSize: 13, color: "var(--ink-2)", margin: "0 0 16px", lineHeight: 1.5 }}>
+      <p style={{ fontSize: 16, color: "var(--ink-2)", margin: "0 0 16px", lineHeight: 1.5 }}>
         Explore the architecture layer by layer. Click any component to open its dossier.
         Use the scrubber below to reveal layers sequentially.
       </p>
@@ -74,7 +74,7 @@ export function IntroCard() {
                 boxShadow: `0 0 6px ${l.ink}`,
               }}
             />
-            <span style={{ fontFamily: "var(--mono)", fontSize: 9, color: "var(--ink-3)" }}>
+            <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-3)" }}>
               {l.n}
             </span>
           </div>

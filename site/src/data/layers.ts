@@ -6,7 +6,7 @@ export const LAYERS: Layer[] = [
     id: "surface",
     name: "User Surface",
     tagline: "Where requests enter the system",
-    ink: "#67E8F9",
+    ink: "var(--ink-l01)",
     exec: "The doors people walk through to talk to the platform — chat, voice, embedded panels, programmatic APIs, and other agents calling in.",
     eng: "Ingress channels. Every channel funnels into a typed request envelope before identity. Streaming over SSE/SignalR for chat; WebRTC for voice; REST + OpenAPI for programmatic; A2A inbound at /.well-known/agent.json.",
     components: [
@@ -52,7 +52,7 @@ export const LAYERS: Layer[] = [
     id: "identity",
     name: "Identity & Trust",
     tagline: "Who is asking, what are they allowed to do",
-    ink: "#38BDF8",
+    ink: "var(--ink-l02)",
     exec: "Verifies the human, gives every agent its own identity, and issues short-lived credentials scoped to the task at hand. No static service accounts.",
     eng: "AuthN + AuthZ plane. Issues scoped credentials per agent invocation. Every downstream tool call carries a propagated identity envelope. Workload identity per agent. Policies as code.",
     components: [
@@ -91,7 +91,7 @@ export const LAYERS: Layer[] = [
     id: "orchestration",
     name: "Orchestration",
     tagline: "Decides what happens, in what order, by whom",
-    ink: "#818CF8",
+    ink: "var(--ink-l03)",
     exec: "The brain of the platform. Reads the request, figures out what kind of work it is, and routes it to the right specialist — keeping the turn loop, budgets, and limits in check.",
     eng: "Receives a typed request, classifies intent, routes to the correct runtime, drives the turn loop, enforces turn and budget limits. CQRS pipeline.",
     components: [
@@ -130,7 +130,7 @@ export const LAYERS: Layer[] = [
     id: "runtime",
     name: "Agent Runtime",
     tagline: "The agents themselves",
-    ink: "#A78BFA",
+    ink: "var(--ink-l04)",
     exec: "The specialist workforce. Each agent declares its skills, tools, and decision style — and loads only what it needs to keep the conversation focused.",
     eng: "Each agent has a manifest declaring skills, tools, decision framework. Skills load progressively to manage context budget. Self-tuning meta-harness drives improvement.",
     components: [
@@ -176,7 +176,7 @@ export const LAYERS: Layer[] = [
     id: "gateway",
     name: "Model Gateway",
     tagline: "Talks to the underlying LLMs",
-    ink: "#C084FC",
+    ink: "var(--ink-l05)",
     exec: "A reverse proxy in front of every model provider. Decides which model handles which request, retries when one fails, caches similar answers, strips sensitive data, and stops runaway costs.",
     eng: "Reverse proxy in front of OpenAI, Anthropic, Azure OpenAI, AI Foundry, Bedrock. The single most under-discussed layer in most architecture diagrams.",
     components: [
@@ -222,7 +222,7 @@ export const LAYERS: Layer[] = [
     id: "tools",
     name: "Tool & Integration Surface",
     tagline: "How agents act on the world",
-    ink: "#E879F9",
+    ink: "var(--ink-l06)",
     exec: "The platform's hands. Lets agents read and write across enterprise systems through a clean, governed catalog — and call other agents when their own skills aren't enough.",
     eng: "MCP server + client. API hub for enterprise system catalog. A2A outbound. Code sandbox for safe execution. Computer use as last resort.",
     components: [
@@ -275,7 +275,7 @@ export const LAYERS: Layer[] = [
     id: "memory",
     name: "Memory & Knowledge",
     tagline: "What the platform remembers",
-    ink: "#F472B6",
+    ink: "var(--ink-l07)",
     exec: "Without this layer, every conversation starts from zero and the agent can't see your company's data. Splits memory three ways — what happened, what's true, and what works — and grounds answers in real documents.",
     eng: "Three-way split: episodic, semantic, procedural — plus a RAG pipeline. Vector store + knowledge graph for hybrid retrieval.",
     components: [
@@ -328,7 +328,7 @@ export const LAYERS: Layer[] = [
     id: "state",
     name: "State & Persistence",
     tagline: "Remembering across turns and restarts",
-    ink: "#FB7185",
+    ink: "var(--ink-l08)",
     exec: "Where working state lives, so a restart, disconnect, or hand-off doesn't lose progress. Every agent's current step is checkpointed and resumable.",
     eng: "Persistent state plane. Checkpointed per transition. Idempotent resume. Service registry for discovery.",
     components: [
@@ -367,7 +367,7 @@ export const LAYERS: Layer[] = [
     id: "observability",
     name: "Observability & Evaluation",
     tagline: "Seeing inside the black box",
-    ink: "#FBBF24",
+    ink: "var(--ink-l09)",
     exec: "With non-deterministic systems, you can't guess — you have to see. Traces every request, scores quality, catches drift, and feeds learnings back into the system.",
     eng: "OpenTelemetry traces, Prometheus metrics, LLM-as-judge scoring, drift detection, human review queue, learnings log.",
     components: [
@@ -420,7 +420,7 @@ export const LAYERS: Layer[] = [
     id: "governance",
     name: "Governance & Control",
     tagline: "Keeping agents safe and accountable",
-    ink: "#F87171",
+    ink: "var(--ink-l10)",
     exec: "What turns a demo into something Legal, Risk, and Compliance will sign off on. Real-time safety checks, tamper-evident audit trail, human escalation paths, and reporting mapped to regulation.",
     eng: "Runtime guardrails (input/output filters), tamper-evident audit log, human escalation tree, autonomy tiering, compliance report generation against ISO 42001 / NIST AI RMF / EU AI Act.",
     components: [

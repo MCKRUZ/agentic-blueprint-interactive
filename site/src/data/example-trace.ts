@@ -70,6 +70,9 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "router",
       title: "Route the request to the right specialist",
       narrative: "A small classifier reads the message, sees \"refund\" + an order context, and routes the conversation to the Refunds specialist agent rather than the general Support supervisor. The router weights this agent highly because its historical first-pass success on refund queries is 94%.",
+      tokens: 420,
+      cost: "$0.0003",
+      duration: "120ms",
       payload: {
         type: "route.decision",
         intent: "refund_status",
@@ -84,10 +87,13 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "05",
-      layer: "agents",
+      layer: "runtime",
       comp: "supervisor",
       title: "Refunds agent plans the turn",
       narrative: "The Refunds agent receives the envelope and drafts a plan: pull the order, check the return status, check Stripe for refund state, then either explain the delay or issue the missing refund. It sets a budget of 4 tool calls and ~6k context tokens before it hands back to the user.",
+      tokens: 1180,
+      cost: "$0.0048",
+      duration: "1.8s",
       payload: {
         type: "agent.plan",
         agent: "agents.refunds.v3",
@@ -107,6 +113,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "rag",
       title: "Pull the refund policy into context",
       narrative: "Before acting, the agent retrieves the company's current refund policy and the SLA on returns from the knowledge base. Hybrid search (BM25 + vector) returns three relevant chunks, reranked, with citations attached so the eventual reply can point Maria at the source.",
+      duration: "340ms",
       payload: {
         type: "memory.rag",
         query: "refund timing policy after warehouse receives return",
@@ -124,6 +131,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "api-hub",
       title: "Look up the order in the CRM",
       narrative: "First tool call. The agent invokes get_order(order_id) through the API hub. The hub propagates Maria's identity, attaches a per-call audit ID, and returns the order with line items and current state. The order shows the return was received 8 days ago.",
+      duration: "312ms",
       payload: {
         type: "tool.call",
         tool: "crm.get_order",
@@ -145,6 +153,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "api-hub",
       title: "Check refund state in Stripe",
       narrative: "Second tool call. The agent checks Stripe directly to confirm whether a refund was actually pushed. Stripe shows no refund on this charge — the WMS marked the return received but the refund job never fired. The agent now knows this is a real bug, not just a delay.",
+      duration: "218ms",
       payload: {
         type: "tool.call",
         tool: "stripe.list_refunds",
@@ -160,10 +169,13 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "09",
-      layer: "guardrails",
+      layer: "governance",
       comp: "guardrails",
       title: "Safety check on the proposed action",
       narrative: "Before issuing the refund, the runtime guardrail checks the action against the safety policy. The amount is within the agent's autonomous limit ($200), the customer matches the order owner, and there's no signal of fraud. The action is cleared. A goodwill credit, however, is flagged for human approval.",
+      tokens: 290,
+      cost: "$0.0011",
+      duration: "85ms",
       payload: {
         type: "guardrail.check",
         proposed_actions: [
@@ -179,6 +191,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "api-hub",
       title: "Issue the refund through Stripe",
       narrative: "Third tool call. The agent calls stripe.create_refund for $147. The call is idempotent — a UUID derived from the order_id prevents a double refund if the agent retries. Stripe confirms the refund will hit Maria's card in 3–5 business days.",
+      duration: "489ms",
       payload: {
         type: "tool.call",
         tool: "stripe.create_refund",
@@ -198,10 +211,11 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "11",
-      layer: "guardrails",
+      layer: "governance",
       comp: "audit",
       title: "Append-only audit record",
       narrative: "Every action so far is hash-chained into the audit log: identity, policy decision, route, tool calls, refund issuance. The log is append-only and cryptographically chained — required for SOX/PCI evidence and the inevitable chargeback dispute.",
+      duration: "45ms",
       payload: {
         type: "audit.append",
         events: 11,
@@ -213,10 +227,13 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "12",
-      layer: "agents",
+      layer: "runtime",
       comp: "supervisor",
       title: "Draft the reply with citations",
       narrative: "The agent writes a short, plain-English reply: apologizes for the delay, names the issue honestly (\"the refund didn't fire when the warehouse marked your return\"), confirms the refund just went through with the arrival window, and proposes a $15 goodwill credit as an apology — pending human approval.",
+      tokens: 2410,
+      cost: "$0.0289",
+      duration: "4.2s",
       payload: {
         type: "agent.draft",
         text: "Hi Maria — I'm sorry, you're right. Your return arrived on April 4 but the refund didn't fire automatically (a known issue we're chasing on our side). I just pushed the $147 refund through Stripe — it should hit your card by April 17. I've also asked our team to add a $15 store credit as an apology; I'll confirm once that's approved.",
@@ -228,10 +245,11 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "13",
-      layer: "guardrails",
+      layer: "governance",
       comp: "guardrails",
       title: "Human-in-the-loop on the goodwill credit",
       narrative: "The goodwill credit pauses for a human. A support lead sees the queued action with full context — the original message, the diagnosis, the refund receipt, the proposed credit, and the agent's reasoning. They approve in 11 seconds. The platform fires the credit and updates the reply.",
+      duration: "11s",
       payload: {
         type: "hitl.review",
         queue: "support.credits",
@@ -247,6 +265,9 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       comp: "tracing",
       title: "Trace, score, and learn from the turn",
       narrative: "OpenTelemetry has captured the full span tree — every model call, tool call, retrieval, and guardrail decision. An LLM judge scores the reply against a customer-support rubric (5/5: empathy, accuracy, action). The turn enters the eval set; the missed-refund bug is filed for the engineering team.",
+      tokens: 99,
+      cost: "$0.0030",
+      duration: "1.2s",
       payload: {
         type: "observability.summary",
         trace_id: "tr_4f9e…",

@@ -29,7 +29,7 @@ function SupervisorViz() {
       ))}
       <circle cx={cx} cy={cy} r="24" fill="var(--c1)" fillOpacity="0.2" stroke="var(--c1)" strokeWidth="1.5"
         style={{ animation: "pop 0.5s ease-out 0.2s both", filter: "drop-shadow(0 0 8px var(--c1))" }} />
-      <text x={cx} y={cy + 3} textAnchor="middle" style={{ fontFamily: "var(--mono)", fontSize: 8, fill: "var(--c1)" }}>SUPER</text>
+      <text x={cx} y={cy + 3} textAnchor="middle" style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--c1)" }}>SUPER</text>
     </g>
   );
 }
@@ -50,7 +50,7 @@ function PipelineViz() {
             fill="var(--c2)" fillOpacity="0.12" stroke="var(--c2)" strokeWidth="1"
             style={{ animation: `pop 0.5s ease-out ${0.2 + i * 0.15}s both` }} />
           <text x={x} y={cy + 3} textAnchor="middle"
-            style={{ fontFamily: "var(--mono)", fontSize: 8, fill: "var(--c2)" }}>
+            style={{ fontFamily: "var(--mono)", fontSize: 10, fill: "var(--c2)" }}>
             S{i + 1}
           </text>
         </g>

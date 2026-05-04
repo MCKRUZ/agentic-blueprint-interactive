@@ -22,11 +22,11 @@ export function Topbar() {
       <div className="flex items-center gap-3 mr-auto">
         <span
           className="font-bold tracking-tight"
-          style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--c1)" }}
+          style={{ fontFamily: "var(--mono)", fontSize: 13, color: "var(--c1)" }}
         >
           AGENTIC BLUEPRINT
         </span>
-        <span style={{ color: "var(--ink-4)", fontSize: 12 }}>
+        <span style={{ color: "var(--ink-4)", fontSize: 15 }}>
           The Anatomy of an Agentic Platform
         </span>
       </div>
@@ -39,7 +39,7 @@ export function Topbar() {
             className="px-3 py-1 rounded-md transition-colors"
             style={{
               fontFamily: "var(--mono)",
-              fontSize: 11,
+              fontSize: 13,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               border: `1px solid ${view === v.key ? "var(--line-3)" : "var(--line)"}`,
@@ -61,7 +61,7 @@ export function Topbar() {
             border: "1px solid var(--line)",
             background: "transparent",
             color: "var(--ink-3)",
-            fontSize: 16,
+            fontSize: 18,
             cursor: "pointer",
           }}
           aria-label="Toggle theme"
@@ -75,7 +75,7 @@ export function Topbar() {
             border: "1px solid var(--line)",
             background: "transparent",
             color: "var(--ink-3)",
-            fontSize: 14,
+            fontSize: 16,
             cursor: "pointer",
           }}
           aria-label="Print"

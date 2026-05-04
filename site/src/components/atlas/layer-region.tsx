@@ -27,33 +27,50 @@ export function LayerRegion({ layer, visible, onOpenLayer, onOpenComp, hoveredCo
         transition: "opacity 0.4s ease, transform 0.4s ease",
       }}
     >
+      {/* Region background fill */}
       <rect
         x={region.x}
         y={region.y}
         width={region.w}
         height={region.h}
-        rx={4}
-        fill="none"
-        stroke="var(--line)"
+        rx={6}
+        fill={layer.ink}
+        fillOpacity={0.06}
+        stroke={layer.ink}
+        strokeOpacity={0.25}
         strokeWidth={1}
       />
 
+      {/* Layer label — positioned above the region */}
       <text
-        x={region.label === "top" ? region.x + region.w / 2 : region.x + 8}
-        y={region.label === "top" ? region.y + 16 : region.y + region.h / 2}
+        x={region.label === "top" ? region.x + region.w / 2 : region.x + 4}
+        y={region.y - 16}
         textAnchor={region.label === "top" ? "middle" : "start"}
-        dominantBaseline={region.label === "top" ? "auto" : "middle"}
-        style={{ fontFamily: "var(--mono)", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", fill: "var(--ink-4)" }}
+        style={{
+          fontFamily: "var(--mono)",
+          fontSize: 13,
+          fontWeight: 600,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          fill: layer.ink,
+        }}
         className="pointer-events-none select-none"
       >
         {layer.n} {layer.name}
       </text>
 
+      {/* Tagline — just above the region */}
       <text
-        x={region.label === "top" ? region.x + region.w / 2 : region.x + 8}
-        y={region.label === "top" ? region.y + 26 : region.y + region.h / 2 + 14}
+        x={region.label === "top" ? region.x + region.w / 2 : region.x + 4}
+        y={region.y - 3}
         textAnchor={region.label === "top" ? "middle" : "start"}
-        style={{ fontFamily: "var(--display)", fontStyle: "italic", fontSize: 9, fill: "var(--ink-4)", opacity: 0.6 }}
+        style={{
+          fontFamily: "var(--display)",
+          fontStyle: "italic",
+          fontSize: 12,
+          fill: "var(--ink-3)",
+          opacity: 0.7,
+        }}
         className="pointer-events-none select-none"
       >
         {layer.tagline}

@@ -3,6 +3,9 @@
 import { useRef, useState, useEffect, useCallback, type ReactNode } from "react";
 import { WORLD_W, WORLD_H } from "@/lib/regions";
 
+const CONTENT_W = 1480;
+const CONTENT_H = 960;
+
 interface Transform {
   x: number;
   y: number;
@@ -18,7 +21,7 @@ interface DragState {
 
 export function AtlasCanvas({ children }: { children: ReactNode }) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 0.6 });
+  const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 });
   const dragRef = useRef<DragState | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -27,8 +30,8 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
       if (!stageRef.current) return;
       const r = stageRef.current.getBoundingClientRect();
       if (r.width < 50 || r.height < 50) return;
-      const k = Math.min((r.width - 60) / WORLD_W, (r.height - 80) / WORLD_H, 0.85);
-      setTransform({ x: r.width / 2, y: r.height / 2 + 20, k: Math.max(0.32, k) });
+      const k = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
+      setTransform({ x: r.width / 2, y: r.height / 2 + 10, k: Math.max(0.5, k) });
     };
     center();
     const ro = new ResizeObserver(center);
@@ -67,7 +70,7 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
     e.preventDefault();
     const dk = -e.deltaY * 0.001;
     setTransform((t) => {
-      const k2 = Math.max(0.25, Math.min(2.5, t.k * (1 + dk)));
+      const k2 = Math.max(0.3, Math.min(4, t.k * (1 + dk)));
       return { ...t, k: k2 };
     });
   }, []);
@@ -75,8 +78,8 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
   const recenter = useCallback(() => {
     if (!stageRef.current) return;
     const r = stageRef.current.getBoundingClientRect();
-    const k = Math.min((r.width - 60) / WORLD_W, (r.height - 80) / WORLD_H, 0.85);
-    setTransform({ x: r.width / 2, y: r.height / 2 + 20, k: Math.max(0.32, k) });
+    const k = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
+    setTransform({ x: r.width / 2, y: r.height / 2 + 10, k: Math.max(0.5, k) });
   }, []);
 
   const svgLeft = transform.x - (WORLD_W * transform.k) / 2;
@@ -93,16 +96,17 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
       onWheel={onWheel}
     >
       <svg
-        width="100%"
-        height="100%"
+        width={WORLD_W}
+        height={WORLD_H}
         style={{
           position: "absolute",
-          inset: 0,
+          left: 0,
+          top: 0,
           transformOrigin: "0 0",
           transform: `translate(${svgLeft}px, ${svgTop}px) scale(${transform.k})`,
           transition: isDragging ? "none" : "transform 0.15s ease-out",
+          overflow: "visible",
         }}
-        viewBox={`0 0 ${WORLD_W} ${WORLD_H}`}
       >
         {children}
       </svg>
@@ -113,7 +117,7 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
         style={{ bottom: 80, right: 16, borderRadius: 8, zIndex: 50 }}
       >
         <button
-          onClick={() => setTransform((t) => ({ ...t, k: Math.min(2.5, t.k * 1.25) }))}
+          onClick={() => setTransform((t) => ({ ...t, k: Math.min(4, t.k * 1.25) }))}
           className="px-2 py-0.5 rounded"
           style={{
             color: "var(--ink-3)",
@@ -125,7 +129,7 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
           +
         </button>
         <button
-          onClick={() => setTransform((t) => ({ ...t, k: Math.max(0.25, t.k * 0.8) }))}
+          onClick={() => setTransform((t) => ({ ...t, k: Math.max(0.3, t.k * 0.8) }))}
           className="px-2 py-0.5 rounded"
           style={{
             color: "var(--ink-3)",

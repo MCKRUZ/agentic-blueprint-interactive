@@ -11,7 +11,7 @@ export function StatRail() {
   return (
     <div
       className="flex items-center justify-center gap-4 py-1.5"
-      style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--ink-4)", letterSpacing: "0.15em" }}
+      style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--ink-4)", letterSpacing: "0.15em" }}
     >
       <span>{LAYERS.length} LAYERS</span>
       <span style={{ color: "var(--line-2)" }}>·</span>

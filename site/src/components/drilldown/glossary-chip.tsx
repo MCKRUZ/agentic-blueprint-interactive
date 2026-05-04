@@ -15,7 +15,7 @@ export function GlossaryChip({ term }: { term: string }) {
         onMouseLeave={() => setOpen(false)}
         style={{
           fontFamily: "var(--mono)",
-          fontSize: 10,
+          fontSize: 12,
           padding: "2px 8px",
           borderRadius: 4,
           border: "1px solid var(--line)",
@@ -37,12 +37,12 @@ export function GlossaryChip({ term }: { term: string }) {
             borderRadius: 8,
             width: 240,
             zIndex: 100,
-            fontSize: 11,
+            fontSize: 13,
             color: "var(--ink-2)",
             lineHeight: 1.4,
           }}
         >
-          <div style={{ fontFamily: "var(--mono)", fontSize: 9, color: "var(--c1)", marginBottom: 4 }}>{term}</div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--c1)", marginBottom: 4 }}>{term}</div>
           {definition}
         </div>
       )}
