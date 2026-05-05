@@ -26,7 +26,7 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "The Anatomy of an Agentic Platform",
   description:
-    "A field atlas exploring the 10-layer, 46-component architecture of an agentic platform.",
+    "A field atlas exploring the 11-layer, 52-component architecture of an agentic platform.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

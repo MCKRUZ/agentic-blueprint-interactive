@@ -251,6 +251,37 @@ const COMP_ENRICHMENT: Record<string, CompEnrichment> = {
     why: "Without explicit tiers, autonomy creeps invisibly and incidents follow. Explicit tiers turn 'is this agent safe to ship?' into a structured question with a structured answer.",
     tech: ["Custom YAML / policy", "Anthropic responsible scaling framework", "OpenAI deployment tiers", "Weights & Biases Launch", "Custom OPA policies", "NIST AI RMF mappings", "EU AI Act compliance frameworks", "ISO 42001 controls"],
   },
+  // ── 11 System of Record ─────────────────────────────────────
+  "crm": {
+    what: "The canonical customer record — accounts, contacts, opportunities, cases, and interaction history. The single place the business trusts for 'who is this customer and what's their status?'",
+    why: "Without a trusted customer system of record, agents hallucinate customer state, duplicate records, and contradict what sales just told the client. Every customer-facing agent must read from and write back to CRM.",
+    tech: ["Salesforce", "Microsoft Dynamics 365", "HubSpot", "Zoho CRM", "SAP CX", "Oracle CX", "Freshsales", "Pipedrive", "Attio"],
+  },
+  "erp": {
+    what: "Financial ledgers, supply chain, procurement, and operational data — the numbers that reconcile at month-end and get audited annually.",
+    why: "An agent that creates a PO, adjusts inventory, or quotes a price without consulting the ERP will generate real financial liability. These systems enforce double-entry integrity and approval workflows that agents must respect.",
+    tech: ["SAP S/4HANA", "Oracle Fusion Cloud", "NetSuite", "Microsoft Dynamics 365 F&O", "Workday Financials", "Sage Intacct", "Infor", "Acumatica", "Epicor"],
+  },
+  "hris": {
+    what: "The org chart, role assignments, compensation bands, and employee lifecycle data — who is who in the enterprise and what they're authorized to do.",
+    why: "Agents routing work, enforcing approval chains, or answering 'who owns this?' need authoritative people data. Stale or wrong org data means work goes to the wrong person or violates segregation-of-duties controls.",
+    tech: ["Workday", "SAP SuccessFactors", "BambooHR", "ADP Workforce Now", "Rippling", "HiBob", "UKG", "Paylocity", "Deel"],
+  },
+  "itsm": {
+    what: "Tickets, incidents, change records, SLAs, and CMDB — the process truth that tracks what's broken, what's changing, and what's been approved.",
+    why: "Agents that resolve issues or trigger changes must create auditable records in the ITSM system. Without it, there's no evidence trail for CAB reviews, no SLA tracking, and no way to correlate agent actions with business outcomes.",
+    tech: ["ServiceNow", "Jira Service Management", "BMC Helix", "Freshservice", "Zendesk", "PagerDuty", "Ivanti", "ManageEngine", "xMatters"],
+  },
+  "data-platform": {
+    what: "The warehouse, lakehouse, and ETL pipelines that consolidate data from across the enterprise into a queryable analytical layer everyone reports from.",
+    why: "Agents doing analysis, generating reports, or grounding answers in business data need a governed, deduplicated, and performant data layer — not raw operational tables that change schema without notice.",
+    tech: ["Snowflake", "Databricks", "Microsoft Fabric", "Google BigQuery", "Amazon Redshift", "dbt", "Fivetran", "Apache Iceberg", "Delta Lake"],
+  },
+  "mdm": {
+    what: "Entity resolution and golden records — the arbiter when CRM says one thing, ERP says another, and HRIS says a third about the same customer, product, or location.",
+    why: "Without MDM, agents propagate whichever version of the truth they hit first. Golden records prevent duplicate creation, contradictory answers, and the slow rot of data quality that compounds across every downstream system.",
+    tech: ["Informatica MDM", "Reltio", "Profisee", "SAP Master Data Governance", "Ataccama", "Semarchy", "Stibo Systems", "Tamr", "Microsoft Purview"],
+  },
 };
 
 for (const layer of LAYERS) {

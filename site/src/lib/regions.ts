@@ -10,7 +10,7 @@ export interface Region {
 }
 
 export const WORLD_W = 1600;
-export const WORLD_H = 1100;
+export const WORLD_H = 1220;
 
 export const REGIONS: Record<string, Region> = {
   surface:       { x:  60, y:  60, w: 1200, h: 110, cols: 5, label: "left" },
@@ -23,6 +23,7 @@ export const REGIONS: Record<string, Region> = {
   tools:         { x: 990, y: 340, w: 270,  h: 540, cols: 1, label: "top" },
   observability: { x: 1290, y: 60, w: 250,  h: 820, cols: 1, label: "top" },
   governance:    { x: 360, y: 910, w: 600,  h: 110, cols: 5, label: "top" },
+  systems:       { x:  60, y: 1050, w: 1200, h: 110, cols: 6, label: "left" },
 };
 
 const PAD = { x: 12, top: 12, bottom: 12 };

@@ -5,6 +5,9 @@ import { WORLD_W, WORLD_H } from "@/lib/regions";
 
 const CONTENT_W = 1480;
 const CONTENT_H = 960;
+const MIN_SCALE = 0.3;
+const MAX_SCALE = 4;
+const MIN_READABLE_SCALE = 0.6;
 
 interface Transform {
   x: number;
@@ -19,25 +22,83 @@ interface DragState {
   ty: number;
 }
 
+function getTouchDistance(t1: Touch, t2: Touch): number {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 export function AtlasCanvas({ children }: { children: ReactNode }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 });
   const dragRef = useRef<DragState | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isNarrow, setIsNarrow] = useState(false);
+  const pinchRef = useRef<{ dist: number; k: number } | null>(null);
 
+  // Track narrow viewport for responsive zoom controls
+  useEffect(() => {
+    const check = () => setIsNarrow(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Auto-fit on mount and resize
   useEffect(() => {
     const center = () => {
       if (!stageRef.current) return;
       const r = stageRef.current.getBoundingClientRect();
       if (r.width < 50 || r.height < 50) return;
-      const k = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
-      setTransform({ x: r.width / 2, y: r.height / 2 + 10, k: Math.max(0.5, k) });
+      const computed = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
+      const k = Math.max(MIN_READABLE_SCALE, computed);
+      setTransform({ x: r.width / 2, y: r.height / 2 + 10, k });
     };
     center();
     const ro = new ResizeObserver(center);
     if (stageRef.current) ro.observe(stageRef.current);
     return () => ro.disconnect();
   }, []);
+
+  // Pinch-to-zoom via touch events
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = getTouchDistance(e.touches[0], e.touches[1]);
+        pinchRef.current = { dist, k: transform.k };
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        e.preventDefault();
+        const dist = getTouchDistance(e.touches[0], e.touches[1]);
+        const ratio = dist / pinchRef.current.dist;
+        const newK = Math.max(MIN_SCALE, Math.min(MAX_SCALE, pinchRef.current.k * ratio));
+        setTransform((t) => ({ ...t, k: newK }));
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        pinchRef.current = null;
+      }
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [transform.k]);
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -70,7 +131,7 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
     e.preventDefault();
     const dk = -e.deltaY * 0.001;
     setTransform((t) => {
-      const k2 = Math.max(0.3, Math.min(4, t.k * (1 + dk)));
+      const k2 = Math.max(MIN_SCALE, Math.min(MAX_SCALE, t.k * (1 + dk)));
       return { ...t, k: k2 };
     });
   }, []);
@@ -78,8 +139,9 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
   const recenter = useCallback(() => {
     if (!stageRef.current) return;
     const r = stageRef.current.getBoundingClientRect();
-    const k = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
-    setTransform({ x: r.width / 2, y: r.height / 2 + 10, k: Math.max(0.5, k) });
+    const computed = Math.min((r.width - 40) / CONTENT_W, (r.height - 40) / CONTENT_H, 1.6);
+    const k = Math.max(MIN_READABLE_SCALE, computed);
+    setTransform({ x: r.width / 2, y: r.height / 2 + 10, k });
   }, []);
 
   const svgLeft = transform.x - (WORLD_W * transform.k) / 2;
@@ -89,7 +151,11 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
     <div
       ref={stageRef}
       className="absolute inset-0"
-      style={{ cursor: isDragging ? "grabbing" : "grab", overflow: "hidden" }}
+      style={{
+        cursor: isDragging ? "grabbing" : "grab",
+        overflow: "hidden",
+        touchAction: "none",
+      }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -113,29 +179,48 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
 
       {/* Zoom controls */}
       <div
-        className="glass absolute flex flex-col gap-1 p-1"
-        style={{ bottom: 80, right: 16, borderRadius: 8, zIndex: 50 }}
+        className="zoom-controls glass absolute flex gap-1 p-1"
+        style={{
+          bottom: isNarrow ? 16 : 80,
+          right: isNarrow ? "50%" : 16,
+          transform: isNarrow ? "translateX(50%)" : undefined,
+          flexDirection: isNarrow ? "row" : "column",
+          borderRadius: 8,
+          zIndex: 50,
+        }}
       >
         <button
-          onClick={() => setTransform((t) => ({ ...t, k: Math.min(4, t.k * 1.25) }))}
+          onClick={() => setTransform((t) => ({ ...t, k: Math.min(MAX_SCALE, t.k * 1.25) }))}
           className="px-2 py-0.5 rounded"
           style={{
             color: "var(--ink-3)",
             border: "1px solid var(--line)",
             background: "transparent",
             cursor: "pointer",
+            minWidth: isNarrow ? 44 : undefined,
+            minHeight: isNarrow ? 44 : undefined,
+            fontSize: isNarrow ? 18 : undefined,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           +
         </button>
         <button
-          onClick={() => setTransform((t) => ({ ...t, k: Math.max(0.3, t.k * 0.8) }))}
+          onClick={() => setTransform((t) => ({ ...t, k: Math.max(MIN_SCALE, t.k * 0.8) }))}
           className="px-2 py-0.5 rounded"
           style={{
             color: "var(--ink-3)",
             border: "1px solid var(--line)",
             background: "transparent",
             cursor: "pointer",
+            minWidth: isNarrow ? 44 : undefined,
+            minHeight: isNarrow ? 44 : undefined,
+            fontSize: isNarrow ? 18 : undefined,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           &minus;
@@ -148,7 +233,12 @@ export function AtlasCanvas({ children }: { children: ReactNode }) {
             border: "1px solid var(--line)",
             background: "transparent",
             cursor: "pointer",
-            fontSize: 12,
+            fontSize: isNarrow ? 18 : 12,
+            minWidth: isNarrow ? 44 : undefined,
+            minHeight: isNarrow ? 44 : undefined,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           &#x27F2;

@@ -10,7 +10,7 @@ import { AtlasCanvas } from "@/components/atlas/atlas-canvas";
 import { LayerRegion } from "@/components/atlas/layer-region";
 import { ConnectionLines } from "@/components/atlas/connection-lines";
 import { RevealScrubber } from "@/components/atlas/reveal-scrubber";
-import { IntroCard } from "@/components/intro-card";
+import { Onboarding } from "@/components/onboarding";
 import { DossierPanel } from "@/components/drilldown/dossier-panel";
 import { AnimatedArrow } from "@/components/drilldown/animated-arrow";
 import { PatternExplorer } from "@/components/patterns/pattern-explorer";
@@ -84,7 +84,7 @@ export default function Home() {
                 />
               ))}
             </AtlasCanvas>
-            <IntroCard />
+            <Onboarding />
             <RevealScrubber />
             <AnimatedArrow />
             <DossierPanel />

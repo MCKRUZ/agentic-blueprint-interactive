@@ -33,6 +33,7 @@ html {
   --ink-l08: #2DD4BF;
   --ink-l09: #FBBF24;
   --ink-l10: #F87171;
+  --ink-l11: #94A3B8;
   --type-scale: 1.18;
   --display: var(--font-source-serif), "Iowan Old Style", Georgia, serif;
   --sans:    var(--font-geist), system-ui, -apple-system, sans-serif;
@@ -40,11 +41,11 @@ html {
 }
 
 [data-theme="light"] {
-  --bg-0:    #F0F3FA;
-  --bg-1:    #E5EAF5;
-  --bg-2:    #D8E0F0;
-  --glass:   rgba(255, 255, 255, 0.65);
-  --glass-2: rgba(255, 255, 255, 0.85);
+  --bg-0:    #F8F9FB;
+  --bg-1:    #EEEFF3;
+  --bg-2:    #E3E5EA;
+  --glass:   rgba(252, 252, 254, 0.72);
+  --glass-2: rgba(252, 252, 254, 0.9);
   --line:    rgba(20, 50, 90, 0.18);
   --line-2:  rgba(20, 50, 90, 0.34);
   --line-3:  rgba(20, 50, 90, 0.6);
@@ -68,6 +69,7 @@ html {
   --ink-l08: #0D9488;
   --ink-l09: #B45309;
   --ink-l10: #DC2626;
+  --ink-l11: #475569;
 }
 
 * { box-sizing: border-box; }
@@ -123,9 +125,9 @@ body::after {
 
 [data-theme="light"] body {
   background:
-    radial-gradient(ellipse 90% 60% at 20% 10%, rgba(14, 116, 144, 0.06), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 90% 90%, rgba(109, 40, 217, 0.06), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(190, 24, 93, 0.04), transparent 60%),
+    radial-gradient(ellipse 90% 60% at 20% 10%, rgba(14, 116, 144, 0.04), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 90%, rgba(109, 40, 217, 0.04), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(190, 24, 93, 0.03), transparent 60%),
     var(--bg-0);
 }
 
@@ -186,8 +188,8 @@ body::after {
 }
 
 [data-theme="light"] .glass {
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(245,248,255,0.78));
-  box-shadow: 0 20px 60px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+  background: linear-gradient(180deg, rgba(252,252,254,0.88), rgba(248,249,251,0.84));
+  box-shadow: 0 20px 60px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
 @media (prefers-reduced-motion: reduce) {

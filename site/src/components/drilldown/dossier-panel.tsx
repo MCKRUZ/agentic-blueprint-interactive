@@ -149,24 +149,7 @@ function LayerDossier({ layer, onOpenComp }: { layer: Layer; onOpenComp: (id: st
         {layer.exec}
       </p>
 
-      <SectionLabel n="02" text="ENGINEERING NOTE" ink={layer.ink} />
-      <blockquote
-        style={{
-          fontFamily: "var(--mono)",
-          fontSize: 18,
-          lineHeight: 1.6,
-          color: "var(--ink)",
-          borderLeft: `3px solid ${layer.ink}`,
-          margin: "0 0 20px",
-          padding: "16px 20px",
-          background: "var(--glass)",
-          borderRadius: "0 8px 8px 0",
-        }}
-      >
-        {layer.eng}
-      </blockquote>
-
-      <SectionLabel n="03" text="COMPONENTS" ink={layer.ink} count={layer.components.length} />
+      <SectionLabel n="02" text="COMPONENTS" ink={layer.ink} count={layer.components.length} />
       <div className="flex flex-col gap-1">
         {layer.components.map((c, i) => (
           <button
@@ -214,14 +197,10 @@ function ComponentDossier({ layer, comp }: { layer: Layer; comp: Component }) {
       </h2>
 
       {/* 01 WHAT IT IS */}
-      {comp.what && (
-        <>
-          <SectionLabel n="01" text="WHAT IT IS" ink={layer.ink} />
-          <p style={{ fontSize: 16, color: "var(--ink-2)", lineHeight: 1.7, margin: 0 }}>
-            {comp.what}
-          </p>
-        </>
-      )}
+      <SectionLabel n="01" text="WHAT IT IS" ink={layer.ink} />
+      <p style={{ fontSize: 16, color: "var(--ink-2)", lineHeight: 1.7, margin: 0 }}>
+        {comp.what || comp.exec}
+      </p>
 
       {/* 02 WHY IT MATTERS */}
       {comp.why && (
@@ -233,39 +212,10 @@ function ComponentDossier({ layer, comp }: { layer: Layer; comp: Component }) {
         </>
       )}
 
-      {/* Engineering Note */}
-      <div className="flex items-center gap-2" style={{ marginTop: 24, marginBottom: 8 }}>
-        <span style={{ fontSize: 16 }}>🔧</span>
-        <span style={{
-          fontFamily: "var(--mono)",
-          fontSize: 12,
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          color: "var(--ink-4)",
-        }}>
-          ENGINEERING NOTE
-        </span>
-      </div>
-      <blockquote
-        style={{
-          fontFamily: "var(--mono)",
-          fontSize: 22,
-          lineHeight: 1.55,
-          color: "var(--ink)",
-          borderLeft: `3px solid ${layer.ink}`,
-          margin: "0 0 8px",
-          padding: "20px 24px",
-          background: "var(--glass)",
-          borderRadius: "0 8px 8px 0",
-        }}
-      >
-        {comp.eng}
-      </blockquote>
-
-      {/* 03 TECHNOLOGIES THAT SOLVE THIS */}
+      {/* TECHNOLOGIES THAT SOLVE THIS */}
       {comp.tech && comp.tech.length > 0 && (
         <>
-          <SectionLabel n="03" text="TECHNOLOGIES THAT SOLVE THIS" ink={layer.ink} count={comp.tech.length} />
+          <SectionLabel n={comp.why ? "03" : "02"} text="TECHNOLOGIES THAT SOLVE THIS" ink={layer.ink} count={comp.tech.length} />
           <div className="flex flex-col gap-0.5">
             {comp.tech.map((t, i) => {
               const entry = lookupTech(t);
@@ -360,7 +310,7 @@ function ComponentDossier({ layer, comp }: { layer: Layer; comp: Component }) {
       {/* Glossary terms */}
       {comp.terms && comp.terms.length > 0 && (
         <>
-          <SectionLabel n="04" text="GLOSSARY" ink={layer.ink} count={comp.terms.length} />
+          <SectionLabel n={comp.tech?.length ? (comp.why ? "04" : "03") : (comp.why ? "03" : "02")} text="GLOSSARY" ink={layer.ink} count={comp.terms.length} />
           <div className="flex flex-wrap gap-1.5">
             {comp.terms.map((term) => (
               <GlossaryChip key={term} term={term} />

@@ -211,6 +211,28 @@ export const EXAMPLE_TRACE: ExampleTrace = {
     },
     {
       n: "11",
+      layer: "systems",
+      comp: "crm",
+      title: "Write the refund back to the system of record",
+      narrative: "The refund is confirmed in Stripe, but the CRM still shows the order as 'returned — pending refund.' The agent writes back to update the canonical customer record: order status flipped to 'refunded,' refund ID attached, resolution timestamp recorded. This ensures every downstream report and the next agent who touches Maria's account sees the truth.",
+      duration: "180ms",
+      payload: {
+        type: "sor.write",
+        system: "crm",
+        entity: "order",
+        entity_id: "A-19284",
+        updates: {
+          status: "refunded",
+          refund_id: "re_3P…",
+          refund_amount: 147.00,
+          resolved_at: "2026-04-12T14:09:18Z",
+          resolved_by: "agents.refunds.v3",
+        },
+        governance_gate: "autonomy_tier_2:auto_allowed",
+      },
+    },
+    {
+      n: "12",
       layer: "governance",
       comp: "audit",
       title: "Append-only audit record",
@@ -226,7 +248,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       },
     },
     {
-      n: "12",
+      n: "13",
       layer: "runtime",
       comp: "supervisor",
       title: "Draft the reply with citations",
@@ -244,7 +266,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       },
     },
     {
-      n: "13",
+      n: "14",
       layer: "governance",
       comp: "guardrails",
       title: "Human-in-the-loop on the goodwill credit",
@@ -260,7 +282,7 @@ export const EXAMPLE_TRACE: ExampleTrace = {
       },
     },
     {
-      n: "14",
+      n: "15",
       layer: "observability",
       comp: "tracing",
       title: "Trace, score, and learn from the turn",
