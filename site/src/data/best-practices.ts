@@ -3307,4 +3307,360 @@ export const PILLARS: Pillar[] = [
     ],
   },
 
+  /* ================================================================
+     10. HUMAN-IN-THE-LOOP
+     ================================================================ */
+  {
+    id: "human-in-the-loop",
+    name: "Human-in-the-Loop",
+    icon: "\u{1F464}",
+    exec:
+      "Fully autonomous AI is a spectrum, not a binary. The highest-performing agentic platforms deliberately engineer human touchpoints — approval gates, escalation paths, override mechanisms, and feedback loops — calibrated to risk, regulatory requirements, and the maturity of each agent capability. Human-in-the-loop design is not a concession to AI limitations; it is a strategic control that builds trust, ensures compliance with emerging AI regulation, and creates the feedback signal that drives progressive autonomy over time.",
+    eng:
+      "Implement human-in-the-loop as a first-class architectural concern, not a bolt-on. The orchestration layer routes decisions to human review based on confidence scores, risk classifications, and regulatory mandates. The runtime enforces approval gates before high-stakes tool execution. The surface layer provides UX patterns — decision-support cards, approval queues, and override controls — that give reviewers the context they need to act quickly and accurately. State management tracks pending approvals with timeouts and fallback policies. Every human decision feeds back into training data and policy refinement, creating a virtuous cycle where agents earn greater autonomy as they demonstrate reliability.",
+    citations: [
+      {
+        id: "anthropic-effective-agents",
+        label: "Building Effective Agents — Human-in-the-Loop Patterns",
+        url: "https://www.anthropic.com/engineering/building-effective-agents",
+        org: "Anthropic",
+      },
+      {
+        id: "ms-autogen-hitl",
+        label: "Microsoft AutoGen — Human-in-the-Loop Tutorial",
+        url: "https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/human-in-the-loop.html",
+        org: "Microsoft",
+      },
+      {
+        id: "eu-ai-act-article14",
+        label: "EU AI Act — Human Oversight Requirements (Article 14)",
+        url: "https://artificialintelligenceact.eu/article/14/",
+        org: "European Union",
+      },
+      {
+        id: "nist-ai-rmf-govern",
+        label: "NIST AI RMF — GOVERN Function: Human-AI Interaction",
+        url: "https://airc.nist.gov/AI_RMF_Interactivity/GOVERN",
+        org: "NIST",
+      },
+      {
+        id: "google-pair-guidebook",
+        label: "Google PAIR — People + AI Guidebook: Human-AI Interaction Patterns",
+        url: "https://pair.withgoogle.com/guidebook/",
+        org: "Google",
+      },
+    ],
+    cells: [
+      /* ── Surface (critical) ──────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "hitl-surf-1",
+            text: "Design approval UX that provides full decision context — agent reasoning, confidence score, affected resources, and reversibility — so reviewers can act in seconds, not minutes",
+            exec:
+              "Human reviewers become bottlenecks when approval interfaces lack context. If a reviewer must leave the approval screen to investigate what the agent wants to do and why, approval latency dominates end-to-end workflow time. Decision-support UX that front-loads context transforms human review from a friction point into a fast, high-quality gate.",
+            eng:
+              "Render approval cards that display: the agent's proposed action in plain language, the chain-of-thought reasoning that led to the decision, a confidence score with calibration context (e.g., 'this agent is correct 94% of the time at this confidence level'), the specific resources affected, whether the action is reversible, and a diff-style preview of the change. Include one-click approve/reject with mandatory rejection-reason capture. Support keyboard shortcuts for high-volume reviewers.",
+          },
+          {
+            id: "hitl-surf-2",
+            text: "Implement batch approval queues for lower-risk items with sorting, filtering, and bulk-action capabilities",
+            exec:
+              "Not every human review requires individual deliberation. When agents generate many similar low-to-medium risk actions (e.g., content moderation decisions, standard refund approvals), forcing one-by-one review wastes reviewer time. Batch approval patterns let humans review at throughput scale while maintaining oversight.",
+            eng:
+              "Build a review queue UI that groups similar pending actions by type, risk tier, and agent. Support sort-by-confidence (review lowest confidence first), filter-by-category, and select-all for bulk approve/reject. Show aggregate statistics: approval rate trends, average review time, and agent accuracy for the batch category. Implement pagination with prefetching so reviewers never wait for the next page.",
+          },
+          {
+            id: "hitl-surf-3",
+            text: "Provide emergency override controls that let authorized users halt, take over, or roll back agent actions in real time",
+            exec:
+              "When an agent goes off-rails — executing a wrong plan, producing harmful outputs, or behaving unpredictably — the time between detection and intervention determines the blast radius. Emergency controls must be immediately accessible, not buried in admin panels.",
+            eng:
+              "Surface a persistent emergency-stop control in the agent monitoring UI that immediately pauses the active workflow, prevents further tool calls, and preserves the full execution state for forensic review. Implement a takeover mode that transfers the in-progress workflow to a human operator with full context. Provide rollback capabilities for reversible actions. Gate emergency controls behind appropriate authorization (RBAC role) but ensure zero-friction access for authorized users — no confirmation dialogs during emergencies.",
+          },
+          {
+            id: "hitl-surf-4",
+            text: "Surface agent confidence and uncertainty to users transparently — never present low-confidence outputs as definitive answers",
+            exec:
+              "Users calibrate their trust in AI systems based on how the system presents its outputs. When an agent presents a 60% confidence answer with the same visual treatment as a 99% confidence answer, users either over-trust (acting on wrong answers) or under-trust (ignoring correct answers). Transparent uncertainty communication enables appropriate reliance.",
+            eng:
+              "Display calibrated confidence indicators alongside agent outputs using a consistent visual language (e.g., high/medium/low badges with color coding). For low-confidence responses, explicitly state the uncertainty and suggest human verification. In structured outputs (tables, recommendations), highlight cells or items where the agent's confidence is below a configurable threshold. Never auto-execute actions when confidence is below the tier's approval threshold.",
+          },
+        ],
+      },
+
+      /* ── Identity (moderate) ─────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "hitl-id-1",
+            text: "Define RBAC roles for human reviewers — approval authority, escalation targets, and override permissions — and enforce them in the approval routing engine",
+            exec:
+              "Not all humans are qualified to approve all agent actions. A junior support agent should not approve a $50,000 refund override, and a marketing reviewer should not approve database schema changes. Role-based approval authority ensures the right human reviews the right action.",
+            eng:
+              "Model reviewer roles with explicit approval scopes: action types they can approve, monetary thresholds, risk tiers, and domain boundaries. Implement an approval-routing engine that matches pending actions to qualified reviewers based on these scopes. Support delegation chains for when primary reviewers are unavailable. Audit all approval authority changes.",
+          },
+          {
+            id: "hitl-id-2",
+            text: "Maintain distinct identity contexts for human-initiated vs. agent-initiated actions so audit trails attribute decisions to the correct actor",
+            exec:
+              "When a human approves an agent's proposed action, the resulting system change has two actors: the agent that proposed it and the human that authorized it. Collapsing these into a single identity — either attributing it solely to the agent or solely to the human — creates audit gaps and liability ambiguity.",
+            eng:
+              "Stamp every action with a composite identity: the originating agent, the authorizing human (if applicable), and the authorization mechanism (auto-approved by policy, human-approved, escalated). Propagate this composite identity through all downstream system calls so that audit logs in systems of record reflect the full decision chain.",
+          },
+        ],
+      },
+
+      /* ── Orchestration (critical) ────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "hitl-orch-1",
+            text: "Implement confidence-based escalation routing — agent actions below a tunable confidence threshold are automatically routed to human review",
+            exec:
+              "The core human-in-the-loop decision is which actions need human review and which can proceed autonomously. Static rules (e.g., 'always review refunds over $100') are a starting point, but confidence-based routing adapts to the actual reliability of each agent on each task type, reducing unnecessary reviews while catching genuinely uncertain decisions.",
+            eng:
+              "Instrument the orchestrator to capture the agent's confidence score (or derive one from logprobs, self-consistency checks, or a calibrated classifier) for every proposed action. Define per-action-type confidence thresholds that route to: auto-execute (high confidence), human review (medium confidence), or human takeover (low confidence). Store threshold configurations externally so they can be tuned without redeployment. Log all routing decisions with the confidence score for threshold optimization.",
+          },
+          {
+            id: "hitl-orch-2",
+            text: "Implement risk-based routing that escalates to human review based on action severity — financial impact, irreversibility, data sensitivity, and regulatory classification",
+            exec:
+              "Confidence alone is insufficient for routing decisions. A highly confident agent can still propose a catastrophic action (e.g., deleting a production database). Risk-based routing ensures that high-stakes actions always receive human oversight regardless of agent confidence, satisfying both operational prudence and regulatory mandates like the EU AI Act's human oversight requirements.",
+            eng:
+              "Classify every tool and action in the platform by risk dimensions: financial impact (thresholds per tier), reversibility (reversible/partially reversible/irreversible), data sensitivity (PII, financial, health), and regulatory classification (EU AI Act high-risk, SOX-relevant, HIPAA-covered). The orchestrator evaluates proposed actions against these classifications and routes to appropriate review queues. High-risk actions require human approval regardless of confidence. Combine risk and confidence scoring into a single routing matrix that the governance team maintains.",
+          },
+          {
+            id: "hitl-orch-3",
+            text: "Design approval workflows with timeout and fallback policies — define what happens when a human reviewer does not respond within the SLA",
+            exec:
+              "A human-in-the-loop system that blocks indefinitely on human approval is worse than a fully autonomous system — it has all the risks of autonomy with none of the speed benefits, plus it degrades user experience. Every approval gate must have a defined timeout with an explicit fallback: escalate, auto-approve, auto-reject, or park.",
+            eng:
+              "Configure per-action-type timeout SLAs (e.g., 30 seconds for chat-embedded approvals, 4 hours for batch reviews, 24 hours for compliance reviews). Implement escalation chains: on timeout, route to a secondary reviewer, then to a manager, then to a fallback policy. Fallback policies include: auto-reject with user notification (safe default for most cases), auto-approve for low-risk items that passed confidence thresholds, or park the workflow and notify the user of the delay. Track timeout rates as a key metric — high timeout rates indicate understaffed review queues.",
+          },
+          {
+            id: "hitl-orch-4",
+            text: "Support progressive autonomy — automatically widen the auto-approve envelope as agents demonstrate sustained accuracy on specific task types",
+            exec:
+              "Static approval thresholds force a permanent trade-off between safety and speed. Progressive autonomy resolves this by treating approval thresholds as dynamic parameters that relax as agents accumulate a track record of accurate decisions on specific task types. This mirrors how organizations build trust with human employees — starting with close supervision and granting more independence as competence is demonstrated.",
+            eng:
+              "Track per-agent, per-task-type accuracy metrics: what percentage of the agent's proposals did human reviewers approve without modification? When an agent sustains >N% approval rate over M decisions on a task type, automatically lower the confidence threshold for human review on that task type (subject to risk-tier floors — high-risk actions always require review). Implement a ratchet-down mechanism: if accuracy drops, automatically tighten thresholds. Expose the progressive-autonomy status in dashboards so stakeholders can see which agents have earned which autonomy levels.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "hitl-run-1",
+            text: "Enforce pre-execution approval gates for tool calls classified as high-risk — the runtime must block execution until human authorization is received",
+            exec:
+              "The runtime is the last enforcement point before an agent's decision becomes a real-world action. If the orchestrator routes an action for human approval but the runtime does not enforce the gate, a race condition or misconfiguration can allow unapproved execution. The runtime must be the authoritative enforcement layer for approval gates.",
+            eng:
+              "Implement a pre-execution hook in the tool-call pipeline that checks whether the proposed call requires human approval (based on the routing decision from the orchestrator). If approval is required, the runtime suspends the execution context (preserving full state), emits an approval-request event, and waits for an authorization token. Only resume execution when a valid, unexpired authorization token is received from an authorized reviewer. Implement a hard timeout that auto-rejects if no authorization arrives.",
+          },
+          {
+            id: "hitl-run-2",
+            text: "Implement graceful workflow suspension and resumption so that human review latency does not corrupt agent state or lose progress",
+            exec:
+              "When an agent workflow pauses for human review, the execution context must be preserved faithfully — conversation history, intermediate results, tool-call queue, and any acquired resources. If the runtime discards state on suspension, the agent either fails to resume or restarts from scratch, wasting all prior computation and creating a poor user experience.",
+            eng:
+              "Serialize the full execution context (agent state, conversation history, pending tool calls, acquired locks, and partial results) to durable storage when a workflow suspends for human review. Implement a resumption protocol that rehydrates the context and continues from the exact suspension point. Handle resource expiration: if tokens, sessions, or locks expired during the human review period, re-acquire them transparently before resuming. Set maximum suspension duration per workflow type — workflows that exceed it are terminated gracefully with user notification.",
+          },
+          {
+            id: "hitl-run-3",
+            text: "Provide a human takeover protocol that transfers an in-flight agent workflow to a human operator with full execution context",
+            exec:
+              "Sometimes the right intervention is not approving or rejecting a single action but taking over the entire workflow — the agent is confused, the user is frustrated, or the situation has become too complex for the agent to handle. A clean takeover protocol preserves the work already done and gives the human operator everything they need to continue.",
+            eng:
+              "Implement a takeover API that: (1) immediately pauses the agent's execution, (2) packages the full context — original user request, conversation history, actions taken so far, current step, and remaining plan — into a human-readable handoff summary, (3) routes the handoff to an appropriate human operator based on skill routing, and (4) notifies the end user that a human is taking over. The human operator's actions are logged in the same trace so the audit trail is continuous. After resolution, optionally feed the human's approach back as a training signal.",
+          },
+        ],
+      },
+
+      /* ── Gateway (minimal) ───────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "hitl-gw-1",
+            text: "Route approval-request and approval-response events through the gateway with the same authentication, rate-limiting, and audit controls as primary agent traffic",
+            exec:
+              "Approval events are security-sensitive control-plane traffic — an attacker who can forge an approval-response can bypass all human oversight. These events must pass through the same gateway controls as agent requests, not through a separate unprotected channel.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Tools (critical) ────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "hitl-tool-1",
+            text: "Classify every tool and action by risk tier — annotate tool registrations with approval requirements so the orchestrator can route deterministically",
+            exec:
+              "Risk-based routing is only as good as the risk classifications on individual tools. If tools are not annotated with their risk profile, the orchestrator must infer risk at runtime, which is fragile and inconsistent. Tool-level risk metadata makes approval routing deterministic and auditable.",
+            eng:
+              "Extend the tool registration schema with risk metadata: risk tier (critical/high/moderate/low), reversibility flag, maximum financial impact, data classification of inputs and outputs, and whether the tool has side effects. The orchestrator reads this metadata to make routing decisions. Require risk annotation as part of the tool onboarding process — reject tool registrations without it. Review and update risk classifications quarterly.",
+          },
+          {
+            id: "hitl-tool-2",
+            text: "Implement dry-run / preview mode for high-risk tools so humans can review the exact effect before authorizing execution",
+            exec:
+              "Asking a reviewer to approve an action described in natural language is less reliable than showing them the exact operation that will execute. Dry-run mode bridges this gap by generating a precise preview — the API call, the SQL statement, the file diff — without executing it.",
+            eng:
+              "Implement a dry-run flag on tool interfaces that returns the full execution plan (API request body, query, file changes) without committing side effects. The approval UX renders the dry-run output as a diff or structured preview. On approval, execute the identical operation — do not re-plan, which could produce a different result. For tools that cannot support dry-run (e.g., third-party APIs without preview modes), generate the closest possible preview from the request payload.",
+          },
+          {
+            id: "hitl-tool-3",
+            text: "Implement tool-level guardrails that enforce hard limits independent of human approval — maximum monetary amounts, rate ceilings, and scope boundaries that no approval can override",
+            exec:
+              "Human approval is not infallible — reviewers can make mistakes, especially under time pressure or in high-volume batch approval flows. Tool-level guardrails provide a safety floor that catches both agent errors and human approval errors, enforcing invariants that should never be violated regardless of who authorized the action.",
+            eng:
+              "Configure per-tool hard limits: maximum monetary value per transaction, maximum records affected per operation, rate ceiling (max calls per time window), and scope boundary (e.g., a tool can only operate on staging, not production). These limits are enforced in the tool execution layer, below the approval layer — even an approved action that exceeds a hard limit is rejected. Log all hard-limit rejections as high-severity events for investigation.",
+          },
+        ],
+      },
+
+      /* ── Memory (minimal) ────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "hitl-mem-1",
+            text: "Persist human feedback — approvals, rejections, corrections, and override reasons — as structured memory that agents can retrieve to improve future decisions",
+            exec:
+              "Every human intervention is a training signal. If human corrections are not captured in agent-accessible memory, the same mistakes recur and humans review the same failure patterns repeatedly, creating a frustrating and unsustainable oversight load.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── State (moderate) ────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "hitl-state-1",
+            text: "Track pending-approval as a first-class workflow state with its own lifecycle — creation, assignment, escalation, timeout, and resolution",
+            exec:
+              "Approval gates introduce a new state in every workflow: pending-human-review. If this state is not modeled explicitly, the system cannot report on approval queue depth, reviewer load, SLA compliance, or bottleneck analysis. Treating approval as a first-class state enables operational visibility.",
+            eng:
+              "Model approval states in the workflow state machine: pending-approval (awaiting assignment), assigned (reviewer claimed), escalated (timeout triggered re-routing), approved, rejected, timed-out. Persist state transitions with timestamps and actor identity. Expose queue-depth and age-of-oldest-pending metrics for operational dashboards. Implement dead-letter handling for approvals that fall through all escalation levels.",
+          },
+          {
+            id: "hitl-state-2",
+            text: "Ensure approval state is durable and survives system restarts — a pending approval must never be silently dropped",
+            exec:
+              "If the system restarts while a workflow is awaiting human approval, the approval request must survive and be re-presented to reviewers. Silently dropping pending approvals means the agent either blocks forever or the action is never reviewed, both of which erode trust in the oversight system.",
+            eng:
+              "Persist all pending-approval records to durable storage (database, not in-memory queue) with the full execution context needed for resumption. On system startup, rehydrate pending approvals and re-emit notification events. Implement a consistency check that reconciles in-flight workflows with the approval store to detect orphaned approvals.",
+          },
+        ],
+      },
+
+      /* ── Observability (moderate) ────────────────────── */
+      {
+        layerId: "observability",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "hitl-obs-1",
+            text: "Track human-in-the-loop metrics — approval latency, rejection rate, override frequency, timeout rate, and reviewer utilization — as first-class observability signals",
+            exec:
+              "Human review is a system resource with capacity constraints. Without metrics on approval latency, queue depth, and reviewer utilization, the organization cannot staff review teams appropriately, identify bottleneck task types, or measure the overhead that human oversight adds to workflow completion time.",
+            eng:
+              "Emit structured telemetry for every approval event: time-to-review (from request to decision), decision outcome (approved/rejected/escalated/timed-out), reviewer identity, and task type. Aggregate into dashboards showing: p50/p95 approval latency by task type, rejection rate trends, timeout rate by queue, and reviewer utilization (approvals per reviewer per hour). Alert on SLA breaches and queue depth exceeding capacity thresholds.",
+          },
+          {
+            id: "hitl-obs-2",
+            text: "Measure and report the human-agent agreement rate to track whether approval thresholds are correctly calibrated",
+            exec:
+              "If human reviewers approve 99% of actions routed to them, the confidence threshold is probably too conservative — the system is wasting reviewer time on actions the agent handles correctly. If the rejection rate is high, the agent may need retraining or the task type may be unsuitable for automation. The agreement rate is the key feedback signal for tuning the human-in-the-loop system.",
+            eng:
+              "Compute per-agent, per-task-type agreement rates: approved-without-modification / total-reviewed. Track this over time with trend analysis. When agreement exceeds a configurable target (e.g., 95% over 500+ reviews), flag the task type as a candidate for threshold relaxation (progressive autonomy). When agreement drops below a floor (e.g., 80%), alert the governance team and tighten thresholds. Include disagreement analysis: categorize rejection reasons to identify systematic failure patterns.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "hitl-gov-1",
+            text: "Establish a human oversight policy that maps every agent capability to an oversight level — fully autonomous, human-on-the-loop, or human-in-the-loop — based on risk classification",
+            exec:
+              "The EU AI Act (Article 14) requires that high-risk AI systems be designed to allow effective human oversight. Beyond regulatory compliance, a formal oversight policy prevents ad-hoc decisions about which actions need review, eliminates gaps in coverage, and provides a defensible framework for progressive autonomy. Without a policy, oversight is inconsistent — some high-risk actions go unreviewed while low-risk actions are over-supervised.",
+            eng:
+              "Document a human oversight matrix that classifies every agent capability by oversight level. Fully autonomous: the agent executes without human review (low-risk, high-confidence tasks). Human-on-the-loop: the agent executes but a human monitors output asynchronously with the ability to intervene. Human-in-the-loop: the agent proposes but a human must approve before execution. Map these levels to the tool risk classifications and confidence thresholds in the orchestration layer. Review the matrix quarterly and whenever new capabilities are deployed.",
+          },
+          {
+            id: "hitl-gov-2",
+            text: "Implement mandatory human review for actions classified as high-risk under the EU AI Act or equivalent regulatory frameworks — no confidence score overrides this requirement",
+            exec:
+              "Regulatory frameworks including the EU AI Act, NIST AI RMF, and sector-specific regulations (financial services, healthcare) mandate human oversight for specific categories of AI-assisted decisions. These are non-negotiable — no level of agent accuracy justifies removing human review for regulatory-mandated categories. Violations carry significant penalties and reputational risk.",
+            eng:
+              "Maintain a regulatory-mandated-review registry: a list of action types, data categories, and decision domains where human review is legally required, tagged by the applicable regulation. The orchestrator checks every proposed action against this registry before applying confidence-based routing — registry matches always route to human review regardless of confidence score. Implement the registry as externally configurable (not hardcoded) so legal and compliance teams can update it without engineering deployments. Audit registry compliance monthly.",
+          },
+          {
+            id: "hitl-gov-3",
+            text: "Require human reviewers to provide structured feedback on rejections — categorized rejection reasons that feed back into agent improvement and threshold tuning",
+            exec:
+              "An approval/reject binary provides minimal signal. Knowing why a reviewer rejected an action — wrong tool, incorrect parameters, policy violation, hallucinated information, inappropriate tone — is essential for targeted agent improvement and for identifying systemic failure patterns that threshold tuning alone cannot fix.",
+            eng:
+              "Present reviewers with a structured rejection form: predefined rejection categories (factual error, policy violation, wrong action, hallucination, scope exceeded, tone/safety), optional free-text elaboration, and a severity rating. Aggregate rejection reasons by category, agent, and task type to identify improvement priorities. Feed structured rejections into the agent fine-tuning pipeline and the prompt engineering feedback loop. Report rejection category trends to governance stakeholders.",
+          },
+          {
+            id: "hitl-gov-4",
+            text: "Audit human-in-the-loop effectiveness — regularly evaluate whether human oversight is actually catching errors and improving outcomes, not just adding latency",
+            exec:
+              "Human oversight has a cost: reviewer staffing, approval latency, and workflow complexity. If reviews are rubber-stamps (99.5% auto-approve) or if reviewers are not catching real errors, the oversight adds cost without value. Regular audits ensure the human-in-the-loop system is actually functioning as a quality gate.",
+            eng:
+              "Conduct quarterly audits: sample approved actions and independently verify correctness (would a more careful review have caught errors that slipped through?). Measure error-catch rate: what percentage of agent errors were caught by human review vs. discovered downstream? Track false-negative rate: errors that human reviewers should have caught but did not. Use audit results to calibrate reviewer training, threshold settings, and staffing levels. Report audit results to governance leadership with recommendations.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "hitl-sys-1",
+            text: "Require human approval before agent-initiated write operations to external systems of record — reads may auto-execute, but creates, updates, and deletes must be gated",
+            exec:
+              "Writes to systems of record (CRMs, ERPs, financial systems) have downstream consequences that are difficult or impossible to reverse. An incorrect CRM update propagates through reporting, an erroneous financial transaction triggers reconciliation cascades. Default-to-review for writes provides a safety net proportional to the impact.",
+            eng:
+              "Classify all system-of-record integrations by operation type: read operations may proceed autonomously based on standard confidence routing, but write operations (create, update, delete) require human approval unless explicitly exempted by the governance policy for specific low-risk write patterns. Present the reviewer with a diff view: current state vs. proposed state in the target system. After approval, execute the write with idempotency protections.",
+          },
+          {
+            id: "hitl-sys-2",
+            text: "Log human approval decisions as part of the system-of-record audit trail — compliance teams must be able to trace any data change back through the approval chain",
+            exec:
+              "In regulated industries, every change to a system of record must be traceable to an authorized decision-maker. When an agent proposes a change and a human approves it, both actors must appear in the audit trail. Without this linkage, compliance teams cannot satisfy audit requests and the organization cannot demonstrate adequate human oversight.",
+            eng:
+              "When a human-approved agent action writes to a system of record, include the approval metadata in the audit entry: approval ID, reviewer identity, timestamp, the original agent proposal, and any modifications the reviewer made. If the system of record supports custom audit fields, write the approval ID directly. Otherwise, maintain a parallel approval-audit log that can be joined to the system-of-record change log by correlation ID.",
+          },
+        ],
+      },
+    ],
+  },
+
 ];
