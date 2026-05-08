@@ -409,4 +409,385 @@ export const PILLARS: Pillar[] = [
       },
     ],
   },
+
+  /* ================================================================ */
+  /*  PILLAR 2 — AI Governance                                        */
+  /* ================================================================ */
+  {
+    id: "ai-governance",
+    name: "AI Governance",
+    icon: "⚖",
+    exec:
+      "Autonomous AI agents make decisions at machine speed across enterprise systems, amplifying the consequences of ungoverned behavior. A structured AI governance program — grounded in ISO/IEC 42001, the EU AI Act risk tiers, and the NIST AI RMF GOVERN function — establishes accountability, risk classification, and policy enforcement across every architecture layer. Without it, organizations face regulatory exposure, unauditable decision chains, and reputational risk from unconstrained agent actions.",
+    eng:
+      "Implement governance as code: machine-readable policies that travel with the agent lifecycle from development through production retirement. Every agent deployment should pass through risk-classification gates, carry an accountability mapping (RACI), emit decision audit events, and enforce guardrails defined in a centralized policy engine. Integrate compliance checks into CI/CD so governance is continuous, not periodic.",
+    citations: [
+      {
+        id: "iso-42001",
+        label: "ISO/IEC 42001:2023 — Artificial Intelligence Management System",
+        url: "https://www.iso.org/standard/81230.html",
+        org: "ISO/IEC",
+      },
+      {
+        id: "eu-ai-act",
+        label: "EU AI Act — Regulation (EU) 2024/1689",
+        url: "https://artificialintelligenceact.eu/the-act/",
+        org: "European Union",
+      },
+      {
+        id: "nist-ai-rmf-gov",
+        label: "NIST AI Risk Management Framework (AI RMF 1.0)",
+        url: "https://www.nist.gov/artificial-intelligence/risk-management-framework",
+        org: "NIST",
+      },
+      {
+        id: "oecd-ai-principles",
+        label: "OECD AI Principles",
+        url: "https://oecd.ai/en/ai-principles",
+        org: "OECD",
+      },
+      {
+        id: "ms-rai-standard-v2",
+        label: "Microsoft Responsible AI Standard v2",
+        url: "https://www.microsoft.com/en-us/ai/principles-and-approach",
+        org: "Microsoft",
+      },
+    ],
+    cells: [
+      /* ── Surface (moderate) ──────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "gov-surf-1",
+            text: "Display AI disclosure and transparency notices at the user interface",
+            exec:
+              "The EU AI Act (Article 50) and OECD Transparency Principle require that users know when they are interacting with an AI system. Failure to disclose creates regulatory liability and erodes user trust.",
+            eng:
+              "Render a persistent AI disclosure badge on all agent-driven interfaces. Include a link to the system's AI transparency card describing model capabilities, limitations, and data usage. Log user acknowledgment events for compliance evidence.",
+          },
+          {
+            id: "gov-surf-2",
+            text: "Provide users with meaningful override and escalation controls",
+            exec:
+              "OECD Principle 1.4 (Human Agency) and ISO 42001 Clause 8.4 require that humans can override AI decisions. Surface-layer controls make this right actionable rather than theoretical.",
+            eng:
+              "Implement a visible 'escalate to human' control on every agent interaction. Allow users to reject, modify, or request re-evaluation of AI-generated outputs. Record all override events with the original AI recommendation for audit comparison.",
+          },
+        ],
+      },
+
+      /* ── Identity (moderate) ─────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "gov-id-1",
+            text: "Maintain a registry of all AI agent identities with accountability mappings",
+            exec:
+              "ISO 42001 Clause 6.1 and the NIST AI RMF GOVERN 1.1 require clear accountability for AI systems. Every agent must have a designated responsible human and organizational owner, not just a service principal.",
+            eng:
+              "Create a machine-readable agent registry linking each agent ID to its responsible team, risk classification, approved capabilities, and deployment environment. Enforce registry enrollment as a pre-deployment gate. Expose the registry via API for governance dashboards.",
+          },
+          {
+            id: "gov-id-2",
+            text: "Enforce role-based governance policies tied to agent classification",
+            exec:
+              "Different agent roles carry different risk profiles. An agent that reads data has a fundamentally different governance posture than one that initiates financial transactions. Policies must reflect this stratification.",
+            eng:
+              "Map agent roles to EU AI Act risk tiers (high, limited, minimal) and apply corresponding governance controls — high-risk agents require human oversight, conformity assessments, and enhanced logging. Enforce these mappings through the identity layer's policy engine.",
+          },
+        ],
+      },
+
+      /* ── Orchestration (critical) ────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "gov-orch-1",
+            text: "Enforce human-in-the-loop approval gates for high-risk orchestration plans",
+            exec:
+              "The EU AI Act (Article 14) mandates human oversight for high-risk AI systems. Multi-step agent plans that touch regulated domains — finance, healthcare, HR — must include explicit human approval checkpoints before execution.",
+            eng:
+              "Implement configurable approval gates in the orchestration pipeline. Tag plan steps with risk classifications; steps exceeding a threshold pause execution and route to a human reviewer with full plan context. Log approval decisions with reviewer identity and timestamp.",
+          },
+          {
+            id: "gov-orch-2",
+            text: "Record complete decision lineage for every orchestration decision",
+            exec:
+              "NIST AI RMF GOVERN 1.5 requires traceability of AI decisions. Orchestration is where the model's reasoning becomes action — the decision lineage here is the backbone of any regulatory audit.",
+            eng:
+              "Capture and persist the full decision chain: input context, model reasoning (chain-of-thought), selected plan, rejected alternatives, and approval status. Store in an append-only audit store with cryptographic integrity. Make lineage queryable by agent ID, time range, and decision type.",
+          },
+          {
+            id: "gov-orch-3",
+            text: "Apply regulatory-aware routing based on task jurisdiction and risk tier",
+            exec:
+              "Different jurisdictions impose different AI obligations. An orchestrator handling EU customer data must apply EU AI Act requirements; one processing US health data must respect HIPAA constraints. The orchestration layer must route governance policies accordingly.",
+            eng:
+              "Implement a jurisdiction-aware policy resolver that evaluates task metadata (user region, data classification, domain) and activates the corresponding regulatory rule set before plan generation. Maintain a regulatory mapping table updated by the compliance team.",
+          },
+          {
+            id: "gov-orch-4",
+            text: "Enforce maximum autonomy boundaries for multi-agent delegation chains",
+            exec:
+              "Unconstrained delegation depth creates accountability gaps — the further an action is from the original human intent, the harder it is to attribute responsibility. ISO 42001 Clause 8.2 requires defined operational boundaries.",
+            eng:
+              "Set configurable limits on delegation depth, total tool invocations per plan, and cumulative risk score per execution. Enforce these at the orchestrator level with automatic escalation when thresholds are approached. Alert the governance dashboard when limits are breached.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "gov-rt-1",
+            text: "Enforce model approval gates and version governance at the runtime",
+            exec:
+              "ISO 42001 Clause 8.3 requires controlled deployment of AI components. No model should reach production without passing through a documented approval process that validates fitness, bias testing, and regulatory compliance.",
+            eng:
+              "Implement a model registry with lifecycle states (draft, approved, deployed, deprecated, retired). Block runtime loading of models not in 'approved' or 'deployed' state. Require sign-off from both engineering and compliance before state transitions. Log all model version changes.",
+          },
+          {
+            id: "gov-rt-2",
+            text: "Implement runtime guardrails that enforce content and behavioral policies",
+            exec:
+              "The NIST AI RMF MAP function requires that AI systems operate within defined boundaries. Runtime guardrails are the enforcement mechanism — they translate governance policies into real-time behavioral constraints.",
+            eng:
+              "Deploy guardrail evaluators (NeMo Guardrails, Guardrails AI, or custom policy engines) that intercept model inputs and outputs. Enforce topic boundaries, output format constraints, factuality checks, and prohibited-content filters. Log all guardrail activations with the triggering input for policy tuning.",
+          },
+          {
+            id: "gov-rt-3",
+            text: "Capture per-invocation provenance metadata for regulatory reporting",
+            exec:
+              "EU AI Act Article 12 requires high-risk systems to generate logs sufficient for post-market monitoring. Per-invocation provenance — which model, which version, which parameters — is the minimum viable audit record.",
+            eng:
+              "Emit structured provenance events for every model invocation: model ID, version hash, prompt template ID, temperature/top-p settings, token counts, latency, and response classification. Store with the same correlation ID used by the orchestration audit trail.",
+          },
+          {
+            id: "gov-rt-4",
+            text: "Enforce data residency and processing locality constraints at runtime",
+            exec:
+              "GDPR, the EU AI Act, and sector regulations mandate that certain data categories are processed only within specific jurisdictions. The runtime must enforce these constraints or the entire governance framework is undermined.",
+            eng:
+              "Tag each runtime environment with its geographic region and data-classification clearance. Implement a pre-dispatch check that validates the request's data classification against the target runtime's clearance. Reject and re-route requests that violate residency rules. Log all routing decisions.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "gov-gw-1",
+            text: "Enforce responsible-use policies at the model gateway",
+            exec:
+              "The gateway is the single chokepoint for all model interactions. Microsoft's Responsible AI Standard v2 requires that AI systems include mechanisms to prevent misuse. Gateway-level enforcement ensures no request bypasses responsible-use policies.",
+            eng:
+              "Deploy a policy enforcement layer at the gateway that evaluates every request against the organization's responsible-use policy: blocked use cases, required disclaimers, mandatory content safety checks, and prohibited prompt patterns. Return structured denial responses with policy references when requests are blocked.",
+          },
+          {
+            id: "gov-gw-2",
+            text: "Implement cost governance and budget enforcement per agent and tenant",
+            exec:
+              "Uncontrolled AI inference costs are a governance failure. ISO 42001 Clause 7.1 (Resource Management) requires that organizations allocate and monitor resources for AI operations. The gateway is the natural metering point.",
+            eng:
+              "Track token consumption per agent, tenant, and model at the gateway. Enforce configurable budget ceilings with soft warnings and hard stops. Emit real-time cost events for the governance dashboard. Implement chargeback reports mapping consumption to business units.",
+          },
+          {
+            id: "gov-gw-3",
+            text: "Maintain a model catalog with risk classifications and approved-use boundaries",
+            exec:
+              "NIST AI RMF GOVERN 1.2 requires an inventory of AI systems with associated risks. The gateway's model catalog serves as the operational manifestation of this inventory, controlling which models can be used for which purposes.",
+            eng:
+              "Maintain a gateway-accessible model catalog recording: model ID, provider, risk classification, approved use cases, prohibited use cases, maximum context window, and data-classification clearance. Reject requests that route to a model outside its approved-use boundary. Sync the catalog with the enterprise AI inventory.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "gov-tool-1",
+            text: "Maintain a governed tool registry with risk classifications and approval status",
+            exec:
+              "Every tool an agent can invoke extends the system's impact surface. ISO 42001 Clause 8.2 requires documented operational procedures. A governed tool registry ensures no unapproved capability enters production.",
+            eng:
+              "Create a tool registry recording: tool ID, description, risk tier, data access scope, approved agent roles, and last review date. Enforce registry enrollment as a prerequisite for tool availability at runtime. Trigger re-review when tools are modified or their access scope changes.",
+          },
+          {
+            id: "gov-tool-2",
+            text: "Require impact assessments for tools that modify external systems",
+            exec:
+              "Tools that write data, trigger workflows, or communicate externally carry higher governance burden than read-only tools. The EU AI Act's conformity assessment requirements extend to the systems AI interacts with, not just the AI itself.",
+            eng:
+              "Classify tools as read-only, state-modifying, or externally-communicating. Require a documented impact assessment for state-modifying and external tools covering: data affected, reversibility, maximum blast radius, and required human oversight level. Store assessments alongside the tool registry entry.",
+          },
+        ],
+      },
+
+      /* ── Memory (moderate) ───────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "gov-mem-1",
+            text: "Enforce data retention and right-to-erasure policies in AI memory stores",
+            exec:
+              "GDPR Article 17 (Right to Erasure) and ISO 42001 Clause 8.4 require that organizations can delete personal data on request. AI memory stores — vector databases, conversation histories, learned preferences — are subject to these obligations.",
+            eng:
+              "Implement automated retention policies on all memory stores with configurable TTLs per data classification. Build a right-to-erasure pipeline that propagates deletion requests across vector stores, conversation logs, and derived embeddings. Verify deletion completeness and log erasure events for compliance evidence.",
+          },
+          {
+            id: "gov-mem-2",
+            text: "Classify and label all data entering AI memory with provenance and sensitivity tags",
+            exec:
+              "Governance requires knowing what data the AI system holds, where it came from, and how sensitive it is. Unlabeled memory is ungovernable memory — it cannot be audited, retained correctly, or deleted on request.",
+            eng:
+              "Tag all ingested data with source provenance, data classification (public, internal, confidential, restricted), and applicable regulatory regime before embedding. Propagate tags to derived artifacts (embeddings, summaries). Enforce tag-based access controls on memory retrieval queries.",
+          },
+        ],
+      },
+
+      /* ── State (minimal) ─────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "gov-st-1",
+            text: "Ensure agent checkpoint state supports reproducibility for regulatory review",
+            exec:
+              "EU AI Act Article 12 and NIST AI RMF GOVERN 1.5 require that high-risk AI decisions are reproducible for audit purposes. Checkpoint state must be sufficient to recreate the agent's decision context at any historical point.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Observability (critical) ────────────────────── */
+      {
+        layerId: "observability",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "gov-obs-1",
+            text: "Implement a governance dashboard with real-time compliance KPIs",
+            exec:
+              "ISO 42001 Clause 9.1 requires monitoring and measurement of AI management system performance. A governance dashboard translates raw telemetry into actionable compliance metrics for leadership and auditors.",
+            eng:
+              "Build a dashboard consuming observability events that surfaces: policy violation rate, human override frequency, model drift indicators, cost-per-decision trends, approval gate latency, and regulatory coverage gaps. Set alert thresholds aligned with risk appetite. Export reports in formats required by regulators.",
+          },
+          {
+            id: "gov-obs-2",
+            text: "Generate tamper-evident audit trails for all AI decisions and actions",
+            exec:
+              "The EU AI Act (Article 12) mandates automatic logging for high-risk AI systems. NIST AI RMF requires auditability across the AI lifecycle. Tamper-evident trails are the foundation of defensible compliance.",
+            eng:
+              "Aggregate decision events from all layers into a centralized, append-only audit store with cryptographic hash chaining. Each entry must include: timestamp, agent ID, action type, input hash, output hash, model version, and human-oversight status. Implement audit log integrity verification as a scheduled compliance check.",
+          },
+          {
+            id: "gov-obs-3",
+            text: "Monitor for model performance drift and trigger governance reviews",
+            exec:
+              "NIST AI RMF MEASURE 2.6 requires ongoing monitoring of AI system performance against established metrics. Model drift — in accuracy, fairness, or behavior — can silently move a compliant system out of compliance.",
+            eng:
+              "Implement statistical drift detection on key model metrics: output distribution, response latency, refusal rate, and fairness indicators across demographic groups. When drift exceeds configured thresholds, automatically create a governance review ticket and optionally pause the affected agent pending review.",
+          },
+          {
+            id: "gov-obs-4",
+            text: "Track and report fairness and bias metrics across protected attributes",
+            exec:
+              "The EU AI Act (Article 10), OECD Principle 1.2 (Fairness), and ISO 42001 Clause 6.1.2 require that AI systems are monitored for discriminatory outcomes. Observability must include fairness metrics, not just performance metrics.",
+            eng:
+              "Compute and log fairness metrics (demographic parity, equalized odds, disparate impact ratio) for agent decisions that affect users. Break down key performance indicators by protected attributes where legally permissible. Alert when metrics diverge beyond acceptable thresholds. Feed results into the governance dashboard.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "gov-gov-1",
+            text: "Establish an AI governance policy lifecycle with version control and periodic review",
+            exec:
+              "ISO 42001 Clause 5.2 requires documented AI policies that are communicated, reviewed, and updated. Static policies become stale as regulations evolve and agent capabilities expand. A managed lifecycle prevents governance decay.",
+            eng:
+              "Store all governance policies as versioned, machine-readable artifacts in source control. Implement a review cadence (quarterly minimum) with automated reminders. Require sign-off from legal, compliance, and engineering before policy changes take effect. Maintain a changelog mapping policy versions to the regulations they address.",
+          },
+          {
+            id: "gov-gov-2",
+            text: "Implement risk classification gates at every stage of the AI lifecycle",
+            exec:
+              "The EU AI Act defines four risk tiers (unacceptable, high, limited, minimal) with escalating obligations. ISO 42001 Clause 6.1 requires risk assessment. Classification must happen at design, deployment, and runtime — not just once at project kickoff.",
+            eng:
+              "Build automated risk-classification checks into the CI/CD pipeline, deployment gates, and runtime policy engine. Evaluate agent capabilities against the EU AI Act Annex III high-risk criteria and organizational risk taxonomy. Block deployment of agents whose risk classification has not been assessed or has expired. Re-classify when capabilities change.",
+          },
+          {
+            id: "gov-gov-3",
+            text: "Define and enforce RACI accountability structures for all AI agent operations",
+            exec:
+              "NIST AI RMF GOVERN 1.1 and ISO 42001 Clause 5.3 require clearly defined roles and responsibilities for AI systems. Without explicit RACI mappings, accountability defaults to 'nobody' when incidents occur.",
+            eng:
+              "Create RACI matrices linking each agent role, data domain, and decision type to specific human roles (Responsible, Accountable, Consulted, Informed). Embed RACI references in agent metadata. Surface accountability chains in the governance dashboard. Require RACI assignment as a pre-deployment gate.",
+          },
+          {
+            id: "gov-gov-4",
+            text: "Automate regulatory compliance mapping and gap analysis",
+            exec:
+              "Organizations operating across jurisdictions face overlapping AI regulations (EU AI Act, NIST AI RMF, ISO 42001, sector-specific rules). Manual compliance mapping is error-prone and cannot scale with regulatory velocity.",
+            eng:
+              "Maintain a regulatory requirements database mapping specific obligations to platform controls. Run automated gap analysis comparing implemented controls against applicable requirements. Generate compliance reports per regulation showing coverage percentage, gaps, and remediation priorities. Update the requirements database as new regulations are published.",
+          },
+          {
+            id: "gov-gov-5",
+            text: "Mandate conformity assessments and documentation for high-risk AI agents",
+            exec:
+              "EU AI Act Articles 9-15 require conformity assessments, technical documentation, and quality management systems for high-risk AI. These are legal prerequisites for market access in the EU, not optional best practices.",
+            eng:
+              "Create conformity assessment templates covering: intended purpose, risk analysis, data governance, technical accuracy metrics, human oversight mechanisms, and cybersecurity measures. Require completed assessments before any high-risk agent enters production. Store assessments in the governance system with links to supporting evidence (test results, audit logs, bias reports).",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "gov-sys-1",
+            text: "Govern data exchange agreements between AI agents and external systems",
+            exec:
+              "When agents interact with systems of record, data crosses organizational and regulatory boundaries. ISO 42001 Clause 8.4 and GDPR Article 28 require documented data processing agreements for automated data exchanges.",
+            eng:
+              "Define machine-readable data exchange contracts for each agent-to-system integration specifying: data fields accessed, purpose limitation, retention obligations, and regulatory constraints. Enforce contracts at the integration layer. Audit actual data flows against contracts periodically and flag deviations.",
+          },
+          {
+            id: "gov-sys-2",
+            text: "Ensure AI-initiated changes to systems of record are attributable and reversible",
+            exec:
+              "OECD Principle 1.3 (Transparency and Explainability) requires that AI-driven actions on business-critical systems can be traced and explained. Irreversible, unattributed changes undermine trust and regulatory defensibility.",
+            eng:
+              "Require all agent-initiated writes to external systems to carry a governance metadata envelope: agent ID, authorization chain, decision rationale, and rollback instructions. Implement compensating transactions or soft-delete patterns for reversibility. Surface agent-initiated change reports in the governance dashboard.",
+          },
+        ],
+      },
+    ],
+  },
 ];
