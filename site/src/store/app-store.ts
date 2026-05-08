@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type View = "atlas" | "patterns" | "example";
+export type View = "atlas" | "patterns" | "example" | "practices";
 export type Theme = "dark" | "light";
 
 interface SourceRect {
@@ -19,6 +19,7 @@ interface AppState {
   openComp: string | null;
   sourceRect: SourceRect | null;
   hoveredComp: string | null;
+  activePillar: string | null;
 
   setView: (v: View) => void;
   setTheme: (t: Theme) => void;
@@ -27,14 +28,16 @@ interface AppState {
   openDossier: (layerId: string, compId?: string | null, rect?: SourceRect | null) => void;
   closeDossier: () => void;
   setHoveredComp: (id: string | null) => void;
+  setActivePillar: (id: string | null) => void;
 }
 
-function syncURL(view: View, layer: string | null, comp: string | null) {
+function syncURL(view: View, layer: string | null, comp: string | null, pillar: string | null = null) {
   if (typeof window === "undefined") return;
   const params = new URLSearchParams();
   if (view !== "atlas") params.set("view", view);
   if (layer) params.set("layer", layer);
   if (comp) params.set("comp", comp);
+  if (pillar) params.set("pillar", pillar);
   const qs = params.toString();
   const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
   window.history.replaceState(null, "", url);
@@ -62,10 +65,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   openComp: null,
   sourceRect: null,
   hoveredComp: null,
+  activePillar: null,
 
   setView: (v) => {
-    set({ view: v, openLayer: null, openComp: null, sourceRect: null });
-    syncURL(v, null, null);
+    set({ view: v, openLayer: null, openComp: null, sourceRect: null, activePillar: null });
+    syncURL(v, null, null, null);
   },
 
   setTheme: (t) => {
@@ -78,15 +82,20 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   openDossier: (layerId, compId = null, rect = null) => {
     set({ openLayer: layerId, openComp: compId, sourceRect: rect });
-    syncURL(get().view, layerId, compId);
+    syncURL(get().view, layerId, compId, null);
   },
 
   closeDossier: () => {
     set({ openLayer: null, openComp: null, sourceRect: null });
-    syncURL(get().view, null, null);
+    syncURL(get().view, null, null, null);
   },
 
   setHoveredComp: (id) => set({ hoveredComp: id }),
+
+  setActivePillar: (id) => {
+    set({ activePillar: id });
+    syncURL(get().view, null, null, id);
+  },
 }));
 
 export function hydrateFromURL() {
@@ -95,8 +104,9 @@ export function hydrateFromURL() {
   const view = (params.get("view") as View) || "atlas";
   const layer = params.get("layer") || null;
   const comp = params.get("comp") || null;
+  const pillar = params.get("pillar") || null;
 
-  useAppStore.setState({ view, openLayer: layer, openComp: comp });
+  useAppStore.setState({ view, openLayer: layer, openComp: comp, activePillar: pillar });
 
   const theme = getInitialTheme();
   useAppStore.setState({ theme });
