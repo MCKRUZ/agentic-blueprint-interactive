@@ -2261,4 +2261,368 @@ export const PILLARS: Pillar[] = [
       },
     ],
   },
+
+  /* ================================================================ */
+  /*  PILLAR 7 — Responsible AI & Ethics                               */
+  /* ================================================================ */
+  {
+    id: "responsible-ai",
+    name: "Responsible AI & Ethics",
+    icon: "\u{2726}",
+    exec:
+      "Agentic AI systems operate with increasing autonomy — generating content, making decisions, and taking actions that directly affect people. Without embedded ethical safeguards, these systems risk producing harmful outputs, amplifying societal biases, making opaque decisions that cannot be explained or challenged, and operating in ways that violate fundamental rights. Responsible AI is not a compliance checkbox — it is an engineering discipline that requires content safety pipelines, bias measurement, fairness testing, transparency mechanisms, and human oversight woven into every architecture layer. The EU AI Act, NIST AI RMF, UNESCO AI Ethics Recommendation, and Microsoft Responsible AI Standard converge on the same imperative: organizations deploying autonomous AI must demonstrate that their systems are fair, transparent, accountable, safe, and inclusive by design.",
+    eng:
+      "Implement responsible AI as runtime-enforced controls, not aspirational policy documents. Deploy content safety classifiers on all inputs and outputs at the gateway. Measure bias across protected attributes using statistical fairness metrics and red-team evaluations. Provide decision explanations through retrieval attribution, chain-of-thought logging, and model cards. Enforce prohibited-use policies through code-level guardrails that cannot be bypassed by prompt manipulation. Build human-in-the-loop review workflows for high-stakes agent decisions. Monitor fairness metrics continuously in production and alert on drift. Treat responsible AI failures — harmful outputs, biased decisions, unexplainable actions — with the same severity as security incidents.",
+    citations: [
+      {
+        id: "nist-ai-rmf-rai",
+        label: "NIST AI Risk Management Framework (AI RMF 1.0) — Trustworthy AI Characteristics",
+        url: "https://www.nist.gov/artificial-intelligence/risk-management-framework",
+        org: "NIST",
+      },
+      {
+        id: "eu-ai-act-rai",
+        label: "EU AI Act — Regulation (EU) 2024/1689: Prohibited Practices and High-Risk Requirements",
+        url: "https://artificialintelligenceact.eu/the-act/",
+        org: "European Union",
+      },
+      {
+        id: "ms-rai-standard-v2",
+        label: "Microsoft Responsible AI Standard v2 — Principles and Implementation Requirements",
+        url: "https://www.microsoft.com/en-us/ai/principles-and-approach",
+        org: "Microsoft",
+      },
+      {
+        id: "unesco-ai-ethics",
+        label: "UNESCO Recommendation on the Ethics of Artificial Intelligence",
+        url: "https://www.unesco.org/en/artificial-intelligence/recommendation-ethics",
+        org: "UNESCO",
+      },
+      {
+        id: "pai-responsible-practices",
+        label: "Partnership on AI — Responsible Practices for Synthetic Media and AI Development",
+        url: "https://partnershiponai.org/responsible-practices-for-synthetic-media/",
+        org: "Partnership on AI",
+      },
+    ],
+    cells: [
+      /* ── Surface (critical) ──────────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "rai-surf-1",
+            text: "Deploy content safety classifiers on all user-facing inputs and outputs",
+            exec:
+              "Users interact directly with AI-generated content at the surface layer. Without content safety filtering, harmful, violent, sexually explicit, or self-harm-promoting outputs reach users unimpeded. The EU AI Act Article 52 and Microsoft RAI Standard require that AI-generated content is subject to safety controls before delivery.",
+            eng:
+              "Integrate a multi-category content safety classifier (Azure AI Content Safety, Llama Guard, or a fine-tuned moderation model) on both inbound user messages and outbound model responses. Classify across severity levels for categories including hate speech, violence, sexual content, self-harm, and dangerous instructions. Block or flag content exceeding configurable severity thresholds. Return safe fallback responses when content is blocked. Log all classification decisions with categories and confidence scores for audit.",
+          },
+          {
+            id: "rai-surf-2",
+            text: "Disclose AI involvement and provide attribution for AI-generated content",
+            exec:
+              "The EU AI Act Article 52 requires that users are informed when they are interacting with an AI system. UNESCO's AI Ethics Recommendation emphasizes transparency as a foundational principle. Users have a right to know when content is AI-generated and to understand the basis for AI decisions that affect them.",
+            eng:
+              "Display clear, persistent indicators when content is AI-generated rather than human-authored. Implement source attribution for RAG-grounded responses — show which documents or sources informed the response. Provide a mechanism for users to view the chain of reasoning or evidence behind AI recommendations. Never disguise AI-generated content as human-produced.",
+          },
+          {
+            id: "rai-surf-3",
+            text: "Provide accessible feedback mechanisms for users to report harmful or biased AI outputs",
+            exec:
+              "Users are the first line of detection for harmful outputs that automated classifiers miss. Without structured feedback channels, harmful content goes unreported, and the organization loses critical signal for improving safety. NIST AI RMF MANAGE 3.1 requires mechanisms for stakeholder feedback on AI system performance.",
+            eng:
+              "Implement a per-response feedback widget that allows users to flag outputs as harmful, biased, inaccurate, or inappropriate with optional free-text context. Route flagged responses to a content safety review queue with SLA-based triage. Feed confirmed harmful outputs back into the content safety classifier training pipeline and red-team test suites. Track flag rates per model version, agent type, and content category.",
+          },
+          {
+            id: "rai-surf-4",
+            text: "Implement inclusivity standards for AI interactions across languages, abilities, and cultural contexts",
+            exec:
+              "AI systems that work well only for English-speaking, able-bodied users in Western cultural contexts exclude large populations and perpetuate inequity. UNESCO's AI Ethics Recommendation and the NIST AI RMF emphasize inclusive design as a core trustworthiness characteristic.",
+            eng:
+              "Test AI interactions across supported languages for quality parity — measure response quality, safety classifier accuracy, and bias metrics per language. Ensure UI components for AI interactions meet WCAG 2.1 AA accessibility standards. Validate that content safety classifiers perform equitably across cultural contexts and dialects. Include diverse user populations in usability testing for AI features.",
+          },
+        ],
+      },
+
+      /* ── Identity (minimal) ──────────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "rai-id-1",
+            text: "Prevent identity attributes from being used as discriminatory inputs to AI decision-making",
+            exec:
+              "Protected attributes in identity tokens — age, gender, ethnicity, disability status — must not flow into AI models as features that drive differential treatment unless explicitly justified and audited. The EU AI Act prohibits AI systems that exploit vulnerabilities related to age, disability, or social situation.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Orchestration (moderate) ────────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "rai-orch-1",
+            text: "Enforce ethical guardrails in agent planning to prevent harmful action sequences",
+            exec:
+              "Orchestrators that decompose goals into multi-step plans can produce action sequences that are individually benign but collectively harmful — for example, gathering personal information across multiple tools to build a profile that enables discrimination. Plan-level ethical validation catches harms that per-step checks miss.",
+            eng:
+              "Implement a plan-validation layer that evaluates proposed agent plans against an ethical policy ruleset before execution. Check for: prohibited action combinations, disproportionate data collection relative to the task, actions that affect protected groups differently, and plans that bypass human oversight requirements. Reject plans that violate ethical constraints with structured feedback to the planning agent.",
+          },
+          {
+            id: "rai-orch-2",
+            text: "Require human-in-the-loop approval for high-stakes agent decisions that affect individuals",
+            exec:
+              "The EU AI Act Article 14 requires human oversight for high-risk AI systems. NIST AI RMF GOVERN 1.4 mandates that organizations define contexts requiring human intervention. Fully autonomous decisions about credit, employment, healthcare, or legal matters create unacceptable risk without human review.",
+            eng:
+              "Classify agent actions by impact level: low (informational responses), medium (data mutations, recommendations), high (financial decisions, access changes, communications to external parties). Route high-impact actions through an approval queue that presents the proposed action, its basis, affected individuals, and potential consequences to a qualified human reviewer. Block execution until approval is received. Log all approval decisions.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "rai-rt-1",
+            text: "Implement grounding mechanisms to reduce hallucination and ensure factual accuracy",
+            exec:
+              "Hallucinated outputs — confident but fabricated claims — erode user trust and can cause real harm when users act on false information. Microsoft's RAI Standard and NIST AI RMF Trustworthy AI characteristics both identify validity and reliability as core requirements. Grounding model outputs in verifiable sources is the primary mitigation.",
+            eng:
+              "Deploy RAG (Retrieval Augmented Generation) pipelines that ground model responses in authoritative source documents. Implement citation injection so every factual claim references its source. Apply a faithfulness evaluator that scores response-to-source consistency and flags low-fidelity outputs for review. For domains where accuracy is critical (medical, legal, financial), enforce minimum grounding scores before delivering responses.",
+          },
+          {
+            id: "rai-rt-2",
+            text: "Conduct systematic red-teaming for harmful outputs before and during production deployment",
+            exec:
+              "Automated safety classifiers catch known harm patterns. Red-teaming discovers novel attack vectors, edge-case failures, and emergent harmful behaviors that classifiers were not trained on. Microsoft's RAI Standard and the NIST AI RMF both require adversarial testing as a pre-deployment gate.",
+            eng:
+              "Establish a red-team program that probes models for: jailbreak vulnerabilities, harmful content generation across all safety categories, bias amplification under adversarial prompts, information extraction attacks, and reasoning failures that lead to harmful actions. Run red-team evaluations as a CI/CD gate before model or prompt deployment. Maintain a red-team test suite that grows with each discovered vulnerability. Run continuous red-team evaluations against production systems on a recurring schedule.",
+          },
+          {
+            id: "rai-rt-3",
+            text: "Enforce prohibited-use policies at the runtime layer to block EU AI Act Article 5 violations",
+            exec:
+              "The EU AI Act Article 5 prohibits specific AI practices: social scoring, real-time biometric identification in public spaces (with exceptions), exploitation of vulnerabilities, and subliminal manipulation. These prohibitions must be enforced through technical controls, not policy alone — a model that can perform prohibited actions but is told not to in a prompt is not compliant.",
+            eng:
+              "Implement a prohibited-use classifier at the runtime layer that detects request patterns matching EU AI Act Article 5 categories. Block requests that would result in social scoring, unauthorized biometric identification, vulnerability exploitation, or manipulative techniques. Enforce these controls at the infrastructure level so they cannot be circumvented by prompt engineering. Log all blocked requests for compliance reporting. Update the classifier as regulatory interpretation evolves.",
+          },
+          {
+            id: "rai-rt-4",
+            text: "Implement content provenance and watermarking for AI-generated outputs",
+            exec:
+              "As AI-generated content becomes indistinguishable from human-created content, provenance tracking becomes essential for trust and accountability. The EU AI Act Article 52 requires labeling of AI-generated content. The C2PA (Coalition for Content Provenance and Authenticity) standard provides a technical framework for content provenance.",
+            eng:
+              "Embed provenance metadata in AI-generated content using C2PA or equivalent standards. For text outputs, include model identifier, generation timestamp, and grounding sources in structured metadata. For image or media outputs, embed watermarks that survive common transformations (compression, cropping, rescaling). Implement verification endpoints that allow downstream consumers to validate content provenance. Store provenance records for audit and regulatory compliance.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "rai-gw-1",
+            text: "Deploy layered content safety filtering at the gateway for all model traffic",
+            exec:
+              "The gateway is the centralized enforcement point for content safety across all agents, models, and use cases. Gateway-level filtering ensures that no model request or response bypasses safety controls regardless of which agent or application initiated it. Defense-in-depth requires both gateway-level and surface-level safety filtering.",
+            eng:
+              "Implement a content safety pipeline at the gateway that processes all inbound prompts and outbound completions. Layer multiple detection strategies: rule-based pattern matching for known harmful patterns, ML-based classifiers for nuanced content categories, and LLM-as-judge evaluation for context-dependent harm. Apply different severity thresholds per use case — a medical information agent has different safety boundaries than a creative writing agent. Emit structured telemetry for all safety decisions.",
+          },
+          {
+            id: "rai-gw-2",
+            text: "Implement bias detection on model outputs at the gateway with statistical monitoring",
+            exec:
+              "Bias in AI outputs manifests across protected attributes: gender, race, age, disability, religion. NIST AI RMF MAP 2.3 requires identifying fairness-related risks. The gateway sees all model traffic, making it the optimal point to measure output bias across the full request distribution rather than isolated test cases.",
+            eng:
+              "Deploy a bias detection pipeline at the gateway that samples model outputs and evaluates them against fairness metrics: demographic parity in recommendations, sentiment consistency across demographic references, stereotype association scores, and representation balance in generated content. Compute metrics on rolling windows per model version and agent type. Alert when bias metrics deviate from established baselines. Feed bias signals into the model evaluation pipeline and governance dashboards.",
+          },
+          {
+            id: "rai-gw-3",
+            text: "Enforce model-level safety configurations and system prompt integrity at the gateway",
+            exec:
+              "Safety-critical system prompts — the instructions that define model behavior boundaries, tone, and prohibited actions — must be tamper-proof and consistently applied. If an agent or developer can override safety-critical system prompt sections, the entire safety architecture is undermined.",
+            eng:
+              "Manage safety-critical system prompt segments as versioned, immutable artifacts deployed through the gateway. Inject mandatory safety instructions into every model call regardless of the calling agent's system prompt. Implement integrity checks that detect and block attempts to override or negate safety instructions through user-message injection. Version and audit all changes to safety prompt configurations.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ────────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "rai-tool-1",
+            text: "Classify tools by ethical risk level and enforce proportionate safeguards",
+            exec:
+              "Tools that affect people directly — sending communications, modifying records, making financial transactions — carry higher ethical risk than read-only tools. NIST AI RMF MANAGE 2.2 requires risk-proportionate controls. A one-size-fits-all tool permission model either over-constrains safe tools or under-constrains dangerous ones.",
+            eng:
+              "Assign each tool an ethical risk classification: low (read-only, no PII), medium (data mutations, PII access), high (external communications, financial actions, decisions affecting individuals). Enforce proportionate safeguards: low-risk tools execute freely, medium-risk tools require audit logging and rate limits, high-risk tools require human approval before execution. Review tool risk classifications quarterly as tool capabilities evolve.",
+          },
+          {
+            id: "rai-tool-2",
+            text: "Validate tool outputs for bias and harmful content before injecting into agent context",
+            exec:
+              "Tools that retrieve data from external systems can introduce biased or harmful content into the agent's context — a search tool returning biased web content, a database query returning historically discriminatory data patterns. Bias enters through tools, not just through the model itself.",
+            eng:
+              "Apply content safety and bias screening to tool outputs before they are injected into the agent's context window. Flag tool results that contain potentially biased data patterns (e.g., historical data reflecting discriminatory practices) with contextual warnings that the agent's system prompt can reference. Log tool output classifications for bias audit trails.",
+          },
+        ],
+      },
+
+      /* ── Memory (moderate) ───────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "rai-mem-1",
+            text: "Audit RAG knowledge bases for bias, accuracy, and representational balance",
+            exec:
+              "RAG memory stores are the factual foundation for grounded AI responses. If the knowledge base contains biased, outdated, or unrepresentative content, every grounded response inherits those biases. NIST AI RMF MAP 2.3 requires assessing data for bias and representativeness.",
+            eng:
+              "Implement periodic audits of RAG knowledge bases covering: source diversity (are multiple perspectives represented?), demographic balance in examples and case studies, currency of information (are outdated practices still indexed?), and accuracy validation against authoritative sources. Generate audit reports with bias scores per content category. Remediate identified gaps through targeted content curation. Track audit coverage and remediation rates on the governance dashboard.",
+          },
+          {
+            id: "rai-mem-2",
+            text: "Prevent conversation memory from creating discriminatory user profiles",
+            exec:
+              "Long-term conversation memory and user preference models can accumulate inferred attributes — political views, health conditions, financial status — that create a discriminatory profiling risk if used as context for future interactions. The EU AI Act prohibits AI systems that create social scoring or exploit vulnerabilities.",
+            eng:
+              "Define and enforce boundaries on what attributes can be stored in user preference models and conversation memory. Block inference and storage of sensitive attributes (political opinions, health status, sexual orientation) unless explicitly consented to for a declared purpose. Implement periodic reviews of accumulated user profiles for discriminatory pattern formation. Provide users with visibility into and control over their stored preference data.",
+          },
+        ],
+      },
+
+      /* ── State (minimal) ─────────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "rai-st-1",
+            text: "Include ethical decision audit context in agent checkpoint state for post-hoc review",
+            exec:
+              "When an agent makes a decision that affects an individual — approving or denying a request, prioritizing one user over another, escalating a case — the ethical basis for that decision must be recoverable from the checkpoint state. NIST AI RMF GOVERN 1.7 requires accountability mechanisms for AI decisions.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Observability (critical) ────────────────────────── */
+      {
+        layerId: "observability",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "rai-obs-1",
+            text: "Monitor fairness metrics continuously in production across protected attributes",
+            exec:
+              "Fairness is not a one-time evaluation — it drifts as user populations, data distributions, and model behavior evolve. NIST AI RMF MEASURE 2.6 and 2.7 require ongoing monitoring of bias and fairness. Without continuous production monitoring, bias regressions go undetected until they cause measurable harm.",
+            eng:
+              "Define fairness metrics per use case: demographic parity (equal positive outcome rates across groups), equalized odds (equal true positive and false positive rates), predictive parity (equal precision across groups), and individual fairness (similar individuals receive similar treatment). Compute metrics on rolling production windows. Segment by protected attributes where available through voluntary self-identification. Alert when metrics deviate from baselines by more than configurable thresholds. Display fairness dashboards alongside accuracy and performance metrics.",
+          },
+          {
+            id: "rai-obs-2",
+            text: "Track and alert on content safety incident rates across all safety categories",
+            exec:
+              "Content safety failures — harmful outputs that bypass filters and reach users — must be tracked as incidents with the same rigor as security breaches. Without incident-rate monitoring, the organization cannot measure safety posture, detect degradation, or demonstrate compliance with EU AI Act safety requirements.",
+            eng:
+              "Emit structured events for every content safety classification: category, severity, action taken (blocked, flagged, passed), model version, and agent type. Compute incident rates (harmful outputs that reached users) per safety category on rolling windows. Set alert thresholds per category — zero tolerance for highest-severity categories, statistical thresholds for lower severities. Generate weekly safety reports for governance review. Feed incident data back into red-team test suites and classifier retraining pipelines.",
+          },
+          {
+            id: "rai-obs-3",
+            text: "Log decision explanations and reasoning traces for all consequential AI decisions",
+            exec:
+              "The EU AI Act Article 13 requires that high-risk AI systems are designed to be sufficiently transparent for users to interpret outputs. NIST AI RMF MEASURE 2.8 requires explainability. When an AI decision affects an individual, the organization must be able to explain why that decision was made — not just what the decision was.",
+            eng:
+              "Capture structured decision explanations for all consequential agent actions: the input context, retrieved sources, model reasoning (chain-of-thought), alternative options considered, confidence levels, and the final decision with its basis. Store explanations linked to the execution trace via trace ID. Implement a decision-review interface where compliance officers can inspect any flagged decision's full reasoning chain. Retain decision explanations for the regulatory-required period (minimum 5 years for EU AI Act high-risk systems).",
+          },
+          {
+            id: "rai-obs-4",
+            text: "Measure and report hallucination rates with automated factuality evaluation",
+            exec:
+              "Hallucination — generating plausible but false information — is a core reliability risk for LLM-based systems. Without systematic measurement, organizations cannot quantify the trustworthiness of their AI outputs or track whether changes improve or degrade factual accuracy. NIST AI RMF identifies validity and reliability as foundational trustworthy AI characteristics.",
+            eng:
+              "Deploy automated factuality evaluators that sample production responses and score them against grounding sources (RAG retrieval hits, knowledge base entries, authoritative reference data). Compute hallucination rates per model version, agent type, and topic domain. Alert when hallucination rates exceed configurable thresholds. Report hallucination metrics alongside accuracy metrics on the model evaluation dashboard. Use high-hallucination responses to enrich red-team test suites.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "rai-gov-1",
+            text: "Conduct human rights impact assessments for all AI systems that affect individuals",
+            exec:
+              "The UNESCO AI Ethics Recommendation and the EU AI Act require that organizations assess the human rights impact of AI systems before deployment. Impact assessments identify risks to fundamental rights — non-discrimination, privacy, freedom of expression, access to services — that technical bias metrics alone do not capture.",
+            eng:
+              "Create a human rights impact assessment (HRIA) template covering: affected populations, fundamental rights at risk, severity and likelihood of adverse impacts, existing mitigations, residual risk, and monitoring plan. Require HRIA completion for all AI systems classified as medium or high risk. Review assessments annually or when system scope changes materially. Publish impact assessment summaries (redacting commercially sensitive details) for transparency. Store HRIAs in the governance system linked to the agent registry.",
+          },
+          {
+            id: "rai-gov-2",
+            text: "Establish an AI ethics review board with authority to block deployments that fail responsible AI criteria",
+            exec:
+              "Technical controls catch measurable harms; an ethics review board catches contextual, societal, and emergent risks that automated systems miss. The NIST AI RMF GOVERN function and Microsoft RAI Standard both require organizational accountability structures with genuine authority over AI deployment decisions.",
+            eng:
+              "Constitute a cross-functional AI ethics board including engineering, legal, compliance, domain experts, and external advisors. Grant the board authority to: review and approve high-risk AI deployments, mandate additional testing or mitigations, block deployments that fail responsible AI criteria, and require post-deployment monitoring plans. Define clear escalation criteria for which deployments require board review. Document all board decisions with rationale.",
+          },
+          {
+            id: "rai-gov-3",
+            text: "Maintain a responsible AI incident response process with defined severity levels and remediation SLAs",
+            exec:
+              "When an AI system produces harmful, biased, or unexplainable outputs in production, the organization needs a structured response process — not ad-hoc scrambling. The EU AI Act Article 62 requires providers of high-risk AI to report serious incidents. Without a defined process, response is slow, inconsistent, and poorly documented.",
+            eng:
+              "Define responsible AI incident severity levels: P1 (immediate harm to individuals, prohibited use detected), P2 (systematic bias confirmed, safety classifier bypass), P3 (isolated harmful output, fairness metric degradation), P4 (user complaint, minor quality concern). Set remediation SLAs per level: P1 requires immediate model/feature disablement, P2 requires remediation within 24 hours, P3 within one sprint, P4 within the next release. Implement a post-incident review process that produces a root-cause analysis and feeds findings back into red-team test suites, classifier training, and governance policies.",
+          },
+          {
+            id: "rai-gov-4",
+            text: "Enforce mandatory bias and fairness testing as a pre-deployment gate for all models and prompts",
+            exec:
+              "NIST AI RMF MEASURE 2.6 requires pre-deployment bias evaluation. The EU AI Act requires that high-risk AI systems are tested for bias before being placed on the market. Deploying models or prompts without bias testing is a governance failure that compounds with each untested deployment.",
+            eng:
+              "Integrate bias and fairness evaluation into the CI/CD pipeline for all model and prompt changes. Run evaluation suites that measure: output consistency across demographic references, sentiment bias in generated content, stereotype association using established benchmarks (BBQ, WinoBias, or domain-specific equivalents), and disparate impact in decision-oriented outputs. Set pass/fail thresholds per metric. Block deployments that fail fairness gates. Store evaluation results in the model registry alongside accuracy metrics.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ────────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "rai-sys-1",
+            text: "Assess systems of record for historical bias before using their data in AI pipelines",
+            exec:
+              "Systems of record reflect historical business decisions that may embed structural biases — lending data reflecting discriminatory practices, hiring records reflecting gender imbalance, customer service data reflecting language biases. Using this data uncritically in AI training or RAG pipelines perpetuates and amplifies these biases. NIST AI RMF MAP 2.3 requires data fitness assessment.",
+            eng:
+              "Conduct bias assessments on data sourced from systems of record before incorporating it into AI training, fine-tuning, or RAG pipelines. Measure demographic distribution, outcome fairness, and representation balance in source data. Document identified biases with remediation strategies (resampling, reweighting, augmentation). Tag data lineage with bias assessment results so downstream consumers can evaluate fitness for their use case.",
+          },
+          {
+            id: "rai-sys-2",
+            text: "Implement fairness-aware data sampling when extracting training data from enterprise systems",
+            exec:
+              "Naive data extraction from enterprise systems produces training sets that reflect operational biases — majority-class overrepresentation, temporal biases from seasonal patterns, and survivorship bias from incomplete records. Fairness-aware sampling corrects these imbalances at the data pipeline stage rather than relying solely on model-level debiasing.",
+            eng:
+              "Implement stratified sampling strategies that ensure balanced representation across protected attributes in training data extracted from systems of record. Apply oversampling or synthetic augmentation for underrepresented groups where appropriate. Document the sampling strategy and its fairness rationale in the data lineage record. Validate that sampled distributions meet predefined balance targets before feeding data into training pipelines.",
+          },
+        ],
+      },
+    ],
+  },
 ];
