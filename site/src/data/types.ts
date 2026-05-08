@@ -82,3 +82,37 @@ export interface ExampleTrace {
   outcome: Record<string, string | number>;
   steps: ExampleStep[];
 }
+
+/* ── Best Practices ─────────────────────────────────── */
+
+export type RelevanceTier = "critical" | "moderate" | "minimal";
+
+export interface Guideline {
+  id: string;
+  text: string;
+  exec: string;
+  eng: string;
+}
+
+export interface MatrixCell {
+  layerId: string;
+  tier: RelevanceTier;
+  guidelines: Guideline[];
+}
+
+export interface Citation {
+  id: string;
+  label: string;
+  url: string;
+  org: string;
+}
+
+export interface Pillar {
+  id: string;
+  name: string;
+  icon: string;
+  exec: string;
+  eng: string;
+  citations: Citation[];
+  cells: MatrixCell[];
+}
