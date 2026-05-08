@@ -2625,4 +2625,362 @@ export const PILLARS: Pillar[] = [
       },
     ],
   },
+
+  /* ================================================================ */
+  /*  PILLAR 8 — Observability & Operations                           */
+  /* ================================================================ */
+  {
+    id: "observability-operations",
+    name: "Observability & Operations",
+    icon: "\u{1F4E1}",
+    exec:
+      "Agentic AI platforms generate execution patterns that are fundamentally harder to observe than traditional request-response services. A single user request can spawn multi-agent workflows spanning dozens of LLM calls, tool invocations, memory reads, and state mutations — each with non-deterministic latency, variable token consumption, and probabilistic correctness. Traditional APM tools capture infrastructure health but miss the AI-specific signals that matter: whether the model hallucinated, whether the agent selected the right tool, whether the retrieval grounded the response, and whether the total cost was proportionate to the value delivered. Without AI-native observability — distributed traces that follow agent delegation chains, LLM-specific metrics (token throughput, grounding scores, tool-call success rates), semantic telemetry that captures intent alongside events, and cost attribution per tenant and per agent — organizations operate their most complex and expensive systems blind. SRE principles must be adapted for AI workloads: SLOs defined on end-to-end agent latency and response quality, error budgets that account for non-determinism, incident playbooks that cover model degradation and safety-threshold breaches, and on-call practices that treat hallucination spikes with the same urgency as availability outages.",
+    eng:
+      "Instrument every layer of the agentic architecture with OpenTelemetry-based distributed tracing, propagating trace context from the surface through orchestration, runtime, gateway, tools, memory, and state. Define LLM-specific semantic conventions for spans: model identifier, prompt/completion token counts, estimated cost, grounding score, and tool-call outcomes. Emit custom metrics for agent-level KPIs — task completion rate, delegation depth, context-window utilization, and hallucination rate. Build cost-attribution pipelines that tag every LLM call and tool invocation with tenant, agent, workflow, and task identifiers, then aggregate into real-time showback dashboards. Define SLOs on P50/P95/P99 inference latency, end-to-end agent response time, and response quality scores. Implement anomaly detection on token consumption patterns, error rates, and latency distributions to surface degradation before users notice. Create AI-specific incident response playbooks covering model regression, safety-classifier bypass, retrieval pipeline failure, and runaway cost scenarios. Treat observability data as a first-class product — it powers debugging, cost optimization, model evaluation, and continuous improvement.",
+    citations: [
+      {
+        id: "otel-genai-semconv",
+        label: "OpenTelemetry Semantic Conventions for Generative AI Systems",
+        url: "https://opentelemetry.io/docs/specs/semconv/gen-ai/",
+        org: "OpenTelemetry / CNCF",
+      },
+      {
+        id: "azure-waf-ai-ops",
+        label: "Azure Well-Architected Framework — Operational Excellence for AI Workloads",
+        url: "https://learn.microsoft.com/en-us/azure/well-architected/ai/observability",
+        org: "Microsoft",
+      },
+      {
+        id: "datadog-llm-obs",
+        label: "Datadog LLM Observability — Tracing and Evaluating LLM Applications",
+        url: "https://www.datadoghq.com/product/llm-observability/",
+        org: "Datadog",
+      },
+      {
+        id: "google-sre-book",
+        label: "Google Site Reliability Engineering — Monitoring Distributed Systems",
+        url: "https://sre.google/sre-book/monitoring-distributed-systems/",
+        org: "Google",
+      },
+      {
+        id: "cncf-observability-wp",
+        label: "CNCF Observability Whitepaper — Cloud-Native Observability Principles",
+        url: "https://github.com/cncf/tag-observability/blob/main/whitepaper.md",
+        org: "CNCF",
+      },
+    ],
+    cells: [
+      /* ── Surface (moderate) ──────────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-surf-1",
+            text: "Expose real-time agent execution status and latency indicators to end users",
+            exec:
+              "Agentic workflows take seconds to minutes — far longer than traditional API calls. Users waiting without feedback lose trust and retry, doubling load. Surfacing execution progress (which agent is active, which step is in progress, elapsed time) converts opaque waits into transparent workflows and reduces abandonment.",
+            eng:
+              "Stream execution-status events to the UI via SSE or WebSocket: current agent identity, active step label, elapsed wall-clock time, and estimated completion. Derive estimates from P50 historical latency for the workflow type. Display a visual progress indicator that maps to orchestration steps. Log client-side perceived latency alongside server-side instrumented latency to identify rendering bottlenecks.",
+          },
+          {
+            id: "obs-surf-2",
+            text: "Provide user-accessible response quality feedback that feeds the evaluation pipeline",
+            exec:
+              "Users detect quality failures — hallucinations, irrelevant responses, tone mismatches — that automated evaluators miss. Structured feedback from the surface layer is the highest-signal evaluation data source. Without a feedback loop, quality degradation goes undetected until it reaches governance escalation thresholds.",
+            eng:
+              "Implement a per-response feedback widget (thumbs up/down plus optional category tags: inaccurate, irrelevant, harmful, slow). Attach the originating trace ID, model version, and agent type to each feedback event. Route feedback to the evaluation pipeline where it joins automated quality scores. Aggregate feedback rates per model version and agent type on the observability dashboard. Alert when negative-feedback rates exceed rolling baselines.",
+          },
+        ],
+      },
+
+      /* ── Identity (minimal) ──────────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "obs-id-1",
+            text: "Attach authenticated identity context to every trace span for tenant-scoped observability",
+            exec:
+              "Multi-tenant agentic platforms must attribute telemetry to specific tenants and users for cost showback, SLO reporting, and incident scoping. Without identity context on spans, observability data is an undifferentiated aggregate that cannot answer 'which tenant is affected?' or 'who is driving this cost spike?'.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Orchestration (critical) ────────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "obs-orch-1",
+            text: "Implement end-to-end distributed tracing across multi-agent delegation chains",
+            exec:
+              "A single user request in a multi-agent system fans out into a tree of agent invocations, each spawning LLM calls, tool executions, and memory operations. Without distributed tracing that follows the full delegation chain, debugging a failure at step 8 of a 12-step workflow requires manually correlating logs across independent agent instances — a process that does not scale.",
+            eng:
+              "Adopt OpenTelemetry trace propagation (W3C TraceContext) across all orchestration boundaries. Create a parent span for the user request and child spans for each agent delegation, preserving the tree structure. Attach span attributes per the OpenTelemetry GenAI semantic conventions: agent role, delegation depth, task description, and orchestration topology. Ensure child agent spans link back to the parent via standard parent-child span relationships. Export traces to a backend supporting tree visualization (Jaeger, Grafana Tempo, Datadog APM).",
+          },
+          {
+            id: "obs-orch-2",
+            text: "Track workflow-level SLOs covering end-to-end latency and task completion rate",
+            exec:
+              "Agent-level metrics (individual LLM call latency, single tool-call duration) do not capture the user experience. A workflow where every individual step is fast but the orchestrator makes poor delegation decisions can still be slow end-to-end. SLOs must be defined at the workflow level — P50/P95/P99 end-to-end latency and task-completion success rate — to align engineering effort with user-perceived quality.",
+            eng:
+              "Define SLIs at the orchestration layer: end-to-end workflow duration (time from user request to final response), task completion rate (did the workflow achieve its stated goal?), and delegation efficiency (ratio of useful agent invocations to total invocations). Set SLOs per workflow type — interactive workflows target P95 < 10s, batch workflows target P99 < 5min. Compute error budgets on a rolling 30-day window. Alert when burn rate indicates SLO breach within the budget period.",
+          },
+          {
+            id: "obs-orch-3",
+            text: "Log orchestration decision points to enable replay and root-cause analysis of workflow failures",
+            exec:
+              "When a multi-agent workflow produces a wrong result or times out, understanding the failure requires seeing every decision the orchestrator made: which plan it generated, which agents it selected, which delegations it attempted, and where the execution diverged from the plan. Without decision-point logging, root-cause analysis depends on reconstructing intent from execution traces alone.",
+            eng:
+              "Emit structured events at each orchestration decision point: plan generation (the full proposed plan), agent selection (candidates considered, selection rationale, selected agent), delegation dispatch (task payload, budget allocated, timeout set), result evaluation (sub-agent output, acceptance/rejection decision), and plan revision (original plan, revision trigger, revised plan). Link all events to the workflow trace via span context. Store decision logs with sufficient retention for post-incident review (minimum 30 days).",
+          },
+          {
+            id: "obs-orch-4",
+            text: "Detect and alert on anomalous workflow patterns — circular delegations, excessive fan-out, and cascading retries",
+            exec:
+              "Multi-agent orchestration can produce pathological execution patterns that waste resources and stall user requests: circular delegation loops where Agent A delegates to Agent B which delegates back to A, excessive fan-out where a supervisor spawns dozens of concurrent agents, and cascading retries where failure recovery triggers more failures. These patterns are invisible without real-time anomaly detection on workflow structure.",
+            eng:
+              "Instrument the orchestration layer to emit workflow-topology metrics: delegation depth, fan-out per orchestration step, retry count per agent, and cycle detection events. Apply statistical anomaly detection (z-score or IQR-based) on these metrics using rolling baselines per workflow type. Alert immediately on detected cycles. Alert on fan-out or retry counts exceeding 2 standard deviations from baseline. Feed anomaly data into the orchestration circuit-breaker to enable automatic mitigation.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "obs-rt-1",
+            text: "Capture LLM-specific metrics on every inference call — token counts, latency, model version, and estimated cost",
+            exec:
+              "LLM inference is the most expensive and latency-sensitive operation in the agentic stack. Without per-call metrics — prompt tokens, completion tokens, time-to-first-token, total latency, model identifier, and cost — organizations cannot optimize spend, detect model degradation, or right-size their model selection. The OpenTelemetry GenAI semantic conventions define a standard schema for these attributes.",
+            eng:
+              "Instrument all LLM client calls to emit spans with attributes per OpenTelemetry GenAI semantic conventions: gen_ai.system, gen_ai.request.model, gen_ai.usage.input_tokens, gen_ai.usage.output_tokens, gen_ai.response.finish_reason, and estimated cost (computed from token counts and model pricing). Record time-to-first-token for streaming responses as a separate metric. Aggregate into dashboards showing token throughput, cost rate, and latency distributions per model and per agent role.",
+          },
+          {
+            id: "obs-rt-2",
+            text: "Implement continuous evaluation in production — grounding score, tool-call success rate, and hallucination detection",
+            exec:
+              "Offline evaluations on benchmarks do not predict production behavior. Model quality drifts with prompt changes, data distribution shifts, and provider-side model updates. Continuous production evaluation — scoring live responses for faithfulness to retrieved context, correctness of tool-call decisions, and factual accuracy — is the only way to detect quality regressions before they accumulate user impact.",
+            eng:
+              "Deploy an evaluation sidecar that samples production responses (10-20% for high-traffic, 100% for low-traffic workflows) and scores them on: grounding fidelity (response-to-source overlap using NLI or token-F1), tool-call appropriateness (did the agent select the right tool for the task?), and hallucination rate (claims present in the response but absent from grounding sources). Store evaluation scores linked to trace IDs. Compute rolling averages per model version and agent type. Alert on score degradation exceeding configurable thresholds.",
+          },
+          {
+            id: "obs-rt-3",
+            text: "Monitor agent resource consumption — context-window utilization, memory footprint, and execution duration per agent instance",
+            exec:
+              "Agents are long-lived processes compared to stateless API handlers. A single agent can accumulate context, hold memory references, and consume compute for the duration of a multi-step workflow. Without per-agent resource monitoring, a memory-leaking agent or context-window-exhausting conversation degrades the platform silently until it triggers an out-of-memory kill or a context-truncation error.",
+            eng:
+              "Emit per-agent-instance metrics at regular intervals: context-window utilization (tokens used / context limit), process memory consumption, wall-clock execution time, and cumulative LLM calls. Set alerts for: context utilization exceeding 80% (trigger summarization), memory growth exceeding 2x baseline (potential leak), and execution duration exceeding the workflow-type P99. Expose resource metrics per agent on an operational dashboard for capacity planning.",
+          },
+          {
+            id: "obs-rt-4",
+            text: "Build semantic telemetry that captures agent intent and reasoning alongside execution events",
+            exec:
+              "Traditional telemetry records what happened — function calls, HTTP requests, database queries. In agentic systems, understanding why an agent took an action is equally important. Semantic telemetry captures the agent's stated intent, the plan it was executing, the reasoning behind tool selection, and the evaluation of intermediate results. Without this layer, post-incident analysis cannot distinguish between a correct execution of a bad plan and a bad execution of a correct plan.",
+            eng:
+              "Extend span attributes with semantic fields: agent.intent (the task goal in natural language), agent.plan_step (which step of the plan this span executes), agent.reasoning (summarized chain-of-thought for the decision), and agent.confidence (model-reported confidence when available). Capture these at the orchestration and runtime layers. Store semantic telemetry in the same trace backend as execution telemetry, enabling correlated queries. Use semantic fields to power a workflow-replay UI that shows reasoning alongside execution.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "obs-gw-1",
+            text: "Instrument the LLM gateway for per-model, per-provider, and per-tenant traffic analytics",
+            exec:
+              "The LLM gateway is the single choke point for all model traffic. It sees every request across all agents, tenants, and model providers. Gateway-level instrumentation provides the authoritative source for token throughput, cost attribution, provider health, and capacity utilization. Without it, cost and performance data must be reconstructed from fragmented agent-level telemetry.",
+            eng:
+              "Emit metrics on every gateway request: model identifier, provider, tenant ID, agent role, token counts (prompt and completion), latency (total and time-to-first-token), HTTP status, and rate-limit headroom. Aggregate into real-time dashboards covering: cost per tenant per hour, token throughput per model, provider error rates, and rate-limit utilization. Use gateway metrics as the source of truth for billing reconciliation and capacity planning.",
+          },
+          {
+            id: "obs-gw-2",
+            text: "Implement provider health monitoring with automated failover telemetry",
+            exec:
+              "LLM providers experience outages, degradations, and rate-limit events that are outside the platform's control. The gateway must detect provider health issues in real time — not after users report failures. Provider health monitoring enables automated failover to backup models and provides the data needed to hold providers accountable against SLAs.",
+            eng:
+              "Track per-provider health signals at the gateway: error rate (4xx, 5xx), P50/P95/P99 latency, rate-limit rejection rate, and response quality scores (from the evaluation pipeline). Compute health scores on 1-minute rolling windows. Trigger automated failover when a provider's health score drops below configurable thresholds. Emit failover events with the trigger reason, source provider, target provider, and affected request count. Display provider health on the operations dashboard with historical trend data.",
+          },
+          {
+            id: "obs-gw-3",
+            text: "Implement cost attribution and showback at the gateway — per tenant, per agent, per workflow",
+            exec:
+              "LLM API costs scale with usage and are often the largest variable cost in agentic platforms. Without granular cost attribution, finance teams cannot allocate costs to business units, engineering cannot identify optimization targets, and product teams cannot price AI features accurately. The gateway — which sees every token — is the natural cost-metering point.",
+            eng:
+              "Compute estimated cost for every gateway request using token counts and model-specific pricing tables (maintained as configuration, updated when providers change pricing). Tag costs with tenant ID, agent role, workflow ID, and task type. Aggregate into showback dashboards with drill-down from tenant to workflow to individual LLM call. Set per-tenant and per-workflow cost budgets with alerts at 80% and hard circuit-breaking at 100%. Reconcile gateway-computed costs against provider invoices monthly.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ────────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-tool-1",
+            text: "Trace every tool invocation with input/output summaries, latency, and success/failure status",
+            exec:
+              "Tool calls are where agents interact with the real world — querying databases, calling APIs, executing code. Tool failures are the most common cause of agent workflow failures, yet they are often logged only as opaque errors in the agent's reasoning trace. Without structured tool-call telemetry, diagnosing whether a workflow failed due to a bad tool call, a tool timeout, or a tool returning unexpected data requires reading raw agent logs.",
+            eng:
+              "Create a child span for every tool invocation with attributes: tool name, input parameters (redacted of PII), output summary (truncated to a configurable size), latency, success/failure status, and error category if failed. Link tool spans to the parent agent span. Aggregate tool metrics: per-tool success rate, P95 latency, invocation count, and error distribution. Alert on tool-level error-rate spikes that exceed historical baselines.",
+          },
+          {
+            id: "obs-tool-2",
+            text: "Monitor tool-call appropriateness — track whether agents select the right tools for their tasks",
+            exec:
+              "An agent can produce a technically successful but semantically wrong result by calling the wrong tool — using a web search when a database lookup was appropriate, or invoking a calculation tool for a question that needed retrieval. Tool-selection accuracy is a leading indicator of agent quality that is invisible in traditional error-rate metrics.",
+            eng:
+              "Sample tool-call decisions in the evaluation pipeline and score tool-selection appropriateness against the task context (using an LLM-as-judge evaluator or human review for high-stakes workflows). Compute tool-selection accuracy per agent type. Alert when accuracy drops below baseline. Feed misclassified tool selections back into agent prompt tuning and the red-team test suite.",
+          },
+        ],
+      },
+
+      /* ── Memory (moderate) ───────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-mem-1",
+            text: "Monitor retrieval quality metrics — relevance, recall, and latency of RAG pipeline results",
+            exec:
+              "The RAG pipeline is the grounding backbone of most agentic systems. If retrieval returns irrelevant or stale documents, every downstream agent response inherits that quality deficit. Retrieval quality is a leading indicator of response quality — degradation here predicts hallucination spikes downstream. Without retrieval-specific monitoring, the root cause of quality regressions is misattributed to the model.",
+            eng:
+              "Instrument the retrieval pipeline to emit per-query metrics: number of chunks retrieved, relevance scores (from the vector similarity or reranker), retrieval latency, and cache hit rate. Sample retrieved chunks through a relevance evaluator (NLI-based or embedding-similarity against the query). Compute rolling retrieval quality scores per knowledge-base partition. Alert on relevance-score degradation that may indicate stale embeddings, index corruption, or data drift.",
+          },
+          {
+            id: "obs-mem-2",
+            text: "Track memory-store health — embedding freshness, index size, and query-latency distributions",
+            exec:
+              "Vector stores and memory backends are stateful infrastructure that degrade gradually: embeddings go stale as source documents change, index size grows unbounded without compaction, and query latency creeps up as data volume increases. Unlike crash failures, gradual degradation is invisible without proactive monitoring.",
+            eng:
+              "Emit infrastructure metrics for all memory stores: index document count, storage size, average and P99 query latency, embedding age distribution (time since last re-embedding), and compaction status. Set alerts for: query latency exceeding SLO targets, embedding age exceeding freshness policy (e.g., >30 days for actively updated sources), and index size approaching capacity limits. Display memory-store health on the infrastructure dashboard alongside compute and network metrics.",
+          },
+        ],
+      },
+
+      /* ── State (moderate) ────────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-st-1",
+            text: "Instrument checkpoint operations with durability confirmation and restore-success tracking",
+            exec:
+              "Workflow checkpoints are the recovery mechanism for long-running agent workflows. A checkpoint that appears to succeed but fails to persist durably — due to storage errors, serialization bugs, or replication lag — defeats the purpose of checkpointing. Without telemetry on checkpoint write-success, restore-success, and restore-fidelity, the recovery mechanism itself becomes an unmonitored single point of failure.",
+            eng:
+              "Emit metrics for every checkpoint operation: write latency, payload size, storage confirmation (was the write acknowledged by durable storage?), and any serialization warnings. Track checkpoint restore operations: restore latency, success/failure status, and state-version compatibility result. Compute checkpoint reliability rate (successful restores / total restore attempts) per workflow type. Alert when checkpoint reliability drops below 99.9% or when write-acknowledgment failures occur.",
+          },
+          {
+            id: "obs-st-2",
+            text: "Monitor state-store capacity, replication lag, and consistency metrics for agent session backends",
+            exec:
+              "Agent state backends (Redis, PostgreSQL, Temporal) underpin workflow durability. Capacity exhaustion causes checkpoint failures; replication lag causes stale reads during failover; consistency violations cause corrupted workflow state. These failure modes are preventable with proactive infrastructure monitoring but catastrophic if discovered only when a recovery attempt fails.",
+            eng:
+              "Collect and alert on state-backend infrastructure metrics: memory/disk utilization, replication lag (for replicated stores), connection pool usage, and operation latency distributions. Set capacity alerts at 70% utilization with projected-exhaustion estimates. Monitor replication lag against the maximum acceptable data-loss window (RPO). Validate consistency by periodically reading recently-written checkpoints and confirming data integrity.",
+          },
+        ],
+      },
+
+      /* ── Observability (critical) ────────────────────────── */
+      {
+        layerId: "observability",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "obs-obs-1",
+            text: "Adopt OpenTelemetry as the telemetry standard and define AI-specific semantic conventions for all instrumentation",
+            exec:
+              "Proprietary telemetry formats create vendor lock-in and fragment observability data across incompatible backends. The OpenTelemetry project — now a CNCF graduated project — provides vendor-neutral APIs, SDKs, and semantic conventions including the emerging GenAI semantic conventions for LLM-specific attributes. Standardizing on OpenTelemetry ensures telemetry portability, consistent attribute naming, and compatibility with the broadest ecosystem of backends and analysis tools.",
+            eng:
+              "Instrument all services with OpenTelemetry SDKs for traces, metrics, and logs. Adopt the OpenTelemetry GenAI semantic conventions for LLM-specific spans: gen_ai.system, gen_ai.request.model, gen_ai.usage.input_tokens, gen_ai.usage.output_tokens, gen_ai.response.finish_reason. Extend with platform-specific conventions for agent attributes (agent.role, agent.delegation_depth, workflow.type). Use the OpenTelemetry Collector for telemetry routing, sampling, and export to backend(s). Define and enforce attribute naming conventions in a shared instrumentation library.",
+          },
+          {
+            id: "obs-obs-2",
+            text: "Implement AI-specific alerting that covers model degradation, safety-threshold breaches, and cost anomalies",
+            exec:
+              "Traditional infrastructure alerts (CPU, memory, error rate) miss AI-specific failure modes: gradual model quality degradation, safety-classifier bypass rates increasing, hallucination rates spiking after a provider model update, or cost anomalies from a runaway agent loop. AI-specific alerts are the early-warning system that prevents silent quality erosion and unexpected cost overruns.",
+            eng:
+              "Define alert rules for AI-specific signals: hallucination rate exceeding baseline by >2 standard deviations, grounding score dropping below minimum threshold, safety-classifier block rate spiking (potential attack), content-safety bypass rate increasing (classifier degradation), per-tenant cost exceeding daily budget, and workflow latency SLO burn rate indicating breach. Route alerts to AI-ops on-call rotation. Include in each alert: the affected metric, current value, baseline value, impacted tenants/workflows, and a link to the relevant dashboard.",
+          },
+          {
+            id: "obs-obs-3",
+            text: "Create AI-specific incident response playbooks for model regression, retrieval failure, and safety-classifier bypass",
+            exec:
+              "AI workloads fail in ways that traditional incident playbooks do not cover: a model provider silently updates their model and quality degrades, the RAG pipeline returns stale documents after a failed re-indexing job, a safety classifier starts passing harmful content after a threshold misconfiguration, or a cost spike from a retry loop drains the monthly budget in hours. Without AI-specific playbooks, on-call engineers fall back to generic troubleshooting that wastes time on the wrong layers.",
+            eng:
+              "Author and maintain runbooks for: (1) model quality regression — symptoms, triage steps (check provider status, compare evaluation scores across model versions, verify prompt integrity), mitigation (failover to backup model, rollback prompt changes); (2) retrieval pipeline failure — symptoms, triage (check index health, embedding freshness, query-latency metrics), mitigation (serve from cache, degrade to non-RAG response with disclosure); (3) safety-classifier bypass — symptoms, triage (check classifier version, threshold configuration, recent deployments), mitigation (increase safety thresholds, enable secondary classifier, page security-on-call); (4) cost anomaly — symptoms, triage (identify top-cost workflow and agent, check for retry loops), mitigation (circuit-break affected workflow, apply emergency rate limits). Store playbooks in the incident management system linked to alert definitions.",
+          },
+          {
+            id: "obs-obs-4",
+            text: "Implement observability-driven continuous improvement — use telemetry to identify optimization targets and validate changes",
+            exec:
+              "Observability is not just for incident detection — it is the data foundation for continuous optimization. Token cost reduction, latency improvement, quality improvement, and model-routing decisions all depend on production telemetry. Without a systematic practice of mining observability data for improvement opportunities, optimization efforts are driven by intuition rather than evidence.",
+            eng:
+              "Establish a weekly review cadence that analyzes: top-cost workflows and agents (candidates for model-tier optimization or prompt compression), highest-latency orchestration paths (candidates for parallelization or caching), lowest-quality agent types (candidates for prompt tuning or model upgrade), and most-frequent tool errors (candidates for tool improvement or fallback strategies). Track optimization impact by comparing before/after metrics for each change. Publish optimization results to the engineering team to build a culture of data-driven AI operations.",
+          },
+        ],
+      },
+
+      /* ── Governance (moderate) ───────────────────────────── */
+      {
+        layerId: "governance",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-gov-1",
+            text: "Define and enforce telemetry retention policies aligned with compliance requirements and operational needs",
+            exec:
+              "Observability data for AI systems captures prompts, completions, reasoning traces, and user interactions that may constitute personal data or regulated content. Retaining everything indefinitely creates compliance risk; deleting too aggressively loses the data needed for incident investigation and model evaluation. Retention policies must balance regulatory requirements, operational needs, and storage costs.",
+            eng:
+              "Define retention tiers for observability data: hot (7-14 days, full-resolution traces and logs for active debugging), warm (30-90 days, sampled traces and aggregated metrics for trend analysis), cold (1-2 years, compliance-required audit logs and incident-related traces). Apply PII redaction before data moves from hot to warm tier. Automate lifecycle management through the telemetry pipeline. Validate retention policies against GDPR, sector-specific regulations, and contractual obligations.",
+          },
+          {
+            id: "obs-gov-2",
+            text: "Publish SLO dashboards and error-budget reports for AI workloads to stakeholders across engineering, product, and leadership",
+            exec:
+              "SLOs are only useful if they drive decisions. Engineering needs SLO dashboards for operational awareness, product needs them for feature-quality accountability, and leadership needs them for investment prioritization. Without cross-functional visibility, SLO breaches are treated as engineering incidents rather than product-quality signals.",
+            eng:
+              "Build tiered dashboards: operational (real-time SLI values, error-budget burn rates, active incidents), product (weekly quality trends, cost-per-interaction, user-feedback rates per feature), and executive (monthly SLO compliance summary, cost trends, quality trends). Automate weekly SLO reports distributed to engineering and product leads. Trigger error-budget-exhaustion reviews that bring engineering and product together to decide between reliability investment and feature velocity.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ────────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "obs-sys-1",
+            text: "Trace agent-to-system interactions with round-trip latency, payload size, and error categorization",
+            exec:
+              "Agents interact with systems of record (CRMs, ERPs, databases) through tool integrations that are often the slowest and most failure-prone links in the execution chain. Without tracing at the system-integration boundary, tool-call failures are attributed to the agent rather than the downstream system, and latency budgets cannot be allocated across the stack.",
+            eng:
+              "Create spans for every system-of-record interaction with attributes: target system identifier, operation type (read/write/query), payload size, round-trip latency, response status, and error category (timeout, auth failure, rate limit, data error). Aggregate per-system metrics: availability, P95 latency, error-rate distribution, and throughput. Display system-health dashboards alongside agent-workflow dashboards to enable cross-stack root-cause analysis. Alert on system-level degradation that will impact agent workflow SLOs.",
+          },
+          {
+            id: "obs-sys-2",
+            text: "Correlate agent workflow traces with system-of-record audit logs for end-to-end accountability",
+            exec:
+              "When an agent modifies a record in a CRM or triggers a transaction in an ERP, the system-of-record's audit log captures the mutation but not the agent reasoning that led to it. The agent trace captures the reasoning but not the downstream system impact. Without correlation between these two telemetry streams, neither the AI team nor the system-of-record team has full accountability context.",
+            eng:
+              "Propagate a correlation identifier (the OpenTelemetry trace ID or a dedicated correlation header) through all agent-to-system interactions. Store the correlation ID in the system-of-record's audit log alongside the mutation record. Build a correlation query interface that, given either a trace ID or a system-audit-log entry, retrieves the full end-to-end context: user request, agent reasoning, tool invocation, and system mutation. Use correlated data for compliance audits and incident investigations.",
+          },
+        ],
+      },
+    ],
+  },
+
 ];
