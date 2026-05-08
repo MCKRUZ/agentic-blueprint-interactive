@@ -15,6 +15,7 @@ import { DossierPanel } from "@/components/drilldown/dossier-panel";
 import { AnimatedArrow } from "@/components/drilldown/animated-arrow";
 import { PatternExplorer } from "@/components/patterns/pattern-explorer";
 import { ExampleView } from "@/components/example/example-view";
+import { BestPracticesView } from "@/components/best-practices/best-practices-view";
 
 export default function Home() {
   const view = useAppStore((s) => s.view);
@@ -37,6 +38,7 @@ export default function Home() {
         case "1": state.setView("atlas"); break;
         case "2": state.setView("patterns"); break;
         case "3": state.setView("example"); break;
+        case "4": state.setView("practices"); break;
         case "ArrowLeft":
           if (state.view === "atlas") {
             e.preventDefault();
@@ -92,6 +94,7 @@ export default function Home() {
         )}
         {view === "patterns" && <PatternExplorer />}
         {view === "example" && <ExampleView />}
+        {view === "practices" && <BestPracticesView />}
       </main>
     </div>
   );

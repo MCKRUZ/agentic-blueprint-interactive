@@ -6,6 +6,7 @@ const VIEWS: { key: View; numeral: string; label: string }[] = [
   { key: "atlas", numeral: "i", label: "Atlas" },
   { key: "patterns", numeral: "ii", label: "Patterns" },
   { key: "example", numeral: "iii", label: "Example" },
+  { key: "practices", numeral: "iv", label: "Practices" },
 ];
 
 export function Topbar() {
