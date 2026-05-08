@@ -29,28 +29,32 @@ export function RelevanceStrip({ cells, onClickLayer }: RelevanceStripProps) {
             title={`${layer.name} — ${tier}`}
             style={{
               flex: 1,
-              height: 32,
+              height: 38,
               borderRadius: 4,
               border: "1px solid var(--line)",
               background: layer.ink,
               opacity: TIER_OPACITY[tier],
               cursor: "pointer",
-              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 2px",
+              overflow: "hidden",
             }}
           >
             <span
               style={{
-                position: "absolute",
-                bottom: -18,
-                left: "50%",
-                transform: "translateX(-50%)",
                 fontFamily: "var(--mono)",
-                fontSize: 9,
-                color: "var(--ink-4)",
+                fontSize: 11,
+                fontWeight: 600,
+                color: "#fff",
+                textShadow: "0 1px 3px rgba(0,0,0,0.7)",
                 whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              {layer.n}
+              {layer.n} {layer.name.split("&")[0].trim()}
             </span>
           </button>
         );

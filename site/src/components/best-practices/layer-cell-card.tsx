@@ -27,23 +27,41 @@ export function LayerCellCard({ cell }: LayerCellCardProps) {
     <div
       id={`cell-${cell.layerId}`}
       className="glass"
-      style={{ padding: "16px 20px", marginBottom: 12 }}
+      style={{ marginBottom: 12, overflow: "hidden" }}
     >
+      {/* Solid colored header bar using layer ink */}
       <div
-        style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: expanded ? 12 : 0, cursor: "pointer" }}
         onClick={() => setExpanded(!expanded)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 16px",
+          cursor: "pointer",
+          background: layer.ink,
+        }}
       >
         <span
           style={{
             fontFamily: "var(--mono)",
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            color: layer.ink,
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            color: "#fff",
+            textShadow: "0 1px 3px rgba(0,0,0,0.5)",
           }}
         >
           {layer.n}
         </span>
-        <span style={{ fontSize: 15, color: "var(--ink)", fontWeight: 500, flex: 1 }}>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            flex: 1,
+            color: "#fff",
+            textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+          }}
+        >
           {layer.name}
         </span>
         <span
@@ -54,8 +72,9 @@ export function LayerCellCard({ cell }: LayerCellCardProps) {
             textTransform: "uppercase",
             padding: "2px 8px",
             borderRadius: 4,
-            border: `1px solid ${TIER_COLORS[cell.tier]}`,
-            color: TIER_COLORS[cell.tier],
+            background: "rgba(0,0,0,0.3)",
+            color: "#fff",
+            border: "1px solid rgba(255,255,255,0.25)",
           }}
         >
           {cell.tier}
@@ -69,21 +88,23 @@ export function LayerCellCard({ cell }: LayerCellCardProps) {
           style={{
             fontFamily: "var(--mono)",
             fontSize: 10,
-            color: "var(--ink-4)",
-            background: "transparent",
-            border: "1px solid var(--line)",
+            color: "#fff",
+            background: "rgba(0,0,0,0.3)",
+            border: "1px solid rgba(255,255,255,0.25)",
             borderRadius: 4,
             padding: "2px 8px",
             cursor: "pointer",
             letterSpacing: "0.1em",
+            textShadow: "0 1px 2px rgba(0,0,0,0.5)",
           }}
         >
           ATLAS →
         </button>
       </div>
 
+      {/* Guidelines — indented below header */}
       {expanded && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ padding: "14px 20px 16px 28px", display: "flex", flexDirection: "column", gap: 10 }}>
           {cell.guidelines.map((g) => (
             <GuidelineItem key={g.id} guideline={g} />
           ))}

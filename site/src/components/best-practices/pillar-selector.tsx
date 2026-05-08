@@ -47,6 +47,7 @@ export function PillarSelector({ pillars, activeId, onSelect }: PillarSelectorPr
                 {p.name}
               </span>
             </div>
+            {/* Tier distribution bar */}
             <div
               style={{
                 display: "flex",
@@ -64,6 +65,31 @@ export function PillarSelector({ pillars, activeId, onSelect }: PillarSelectorPr
           </button>
         );
       })}
+
+      {/* Legend for spark bar colors */}
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          marginTop: 8,
+          paddingLeft: 4,
+        }}
+      >
+        <LegendDot color="var(--c1)" label="Critical" />
+        <LegendDot color="var(--c3)" label="Moderate" />
+        <LegendDot color="var(--ink-4)" label="Minimal" />
+      </div>
+    </div>
+  );
+}
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div style={{ width: 6, height: 6, borderRadius: "50%", background: color }} />
+      <span style={{ fontFamily: "var(--mono)", fontSize: 9, color: "var(--ink-4)", letterSpacing: "0.1em" }}>
+        {label.toUpperCase()}
+      </span>
     </div>
   );
 }

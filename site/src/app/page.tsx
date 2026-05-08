@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useAppStore, hydrateFromURL } from "@/store/app-store";
 import { LAYERS } from "@/data/layers";
 import "@/data/enrichment";
@@ -15,7 +16,17 @@ import { DossierPanel } from "@/components/drilldown/dossier-panel";
 import { AnimatedArrow } from "@/components/drilldown/animated-arrow";
 import { PatternExplorer } from "@/components/patterns/pattern-explorer";
 import { ExampleView } from "@/components/example/example-view";
-import { BestPracticesView } from "@/components/best-practices/best-practices-view";
+
+const BestPracticesView = dynamic(
+  () => import("@/components/best-practices/best-practices-view").then((m) => m.BestPracticesView),
+  { ssr: false, loading: () => (
+    <div className="flex items-center justify-center h-full">
+      <span style={{ fontFamily: "var(--mono)", fontSize: 14, color: "var(--ink-4)" }}>
+        Loading practices…
+      </span>
+    </div>
+  )},
+);
 
 export default function Home() {
   const view = useAppStore((s) => s.view);
