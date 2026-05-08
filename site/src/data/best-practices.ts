@@ -1502,4 +1502,393 @@ export const PILLARS: Pillar[] = [
       },
     ],
   },
+
+  /* ================================================================ */
+  /*  PILLAR 5 — Data Sovereignty                                     */
+  /* ================================================================ */
+  {
+    id: "data-sovereignty",
+    name: "Data Sovereignty",
+    icon: "\u{1F5C4}",
+    exec:
+      "Agentic AI platforms ingest, process, and store data across every layer — prompts, conversation histories, embeddings, tool payloads, and inference outputs all carry regulatory obligations. GDPR, ISO/IEC 27701, the NIST Privacy Framework, and the EU Data Governance Act impose enforceable requirements on data classification, residency, cross-border transfer, encryption, consent, and subject rights that apply regardless of whether a human or an autonomous agent handles the data. Without a Data Sovereignty discipline embedded in the architecture, organizations face regulatory penalties, data breach liability, and the inability to honor data subject rights across AI-specific data stores like vector databases and prompt logs.",
+    eng:
+      "Treat every data flow in the agentic platform as a regulated pipeline. Classify all data at ingestion with sensitivity labels and jurisdictional tags. Enforce residency constraints at storage, processing, and transit boundaries — not just at the perimeter. Implement PII detection before every model call, automate DSAR fulfillment across all data stores including vector databases and conversation logs, manage consent for AI training data with granular opt-in/opt-out, encrypt with customer-managed keys using envelope encryption, and maintain full data lineage from source through embedding to agent response. Cross-border transfers must use legally valid mechanisms (SCCs, adequacy decisions, binding corporate rules) verified at the gateway before data leaves its jurisdiction.",
+    citations: [
+      {
+        id: "gdpr-regulation",
+        label: "General Data Protection Regulation (GDPR) — Regulation (EU) 2016/679",
+        url: "https://gdpr-info.eu/",
+        org: "European Union",
+      },
+      {
+        id: "iso-27701",
+        label: "ISO/IEC 27701:2019 — Privacy Information Management System (PIMS)",
+        url: "https://www.iso.org/standard/71670.html",
+        org: "ISO/IEC",
+      },
+      {
+        id: "nist-privacy-framework",
+        label: "NIST Privacy Framework: A Tool for Improving Privacy through Enterprise Risk Management",
+        url: "https://www.nist.gov/privacy-framework",
+        org: "NIST",
+      },
+      {
+        id: "eu-data-governance-act",
+        label: "EU Data Governance Act — Regulation (EU) 2022/868",
+        url: "https://digital-strategy.ec.europa.eu/en/policies/data-governance-act",
+        org: "European Union",
+      },
+      {
+        id: "edpb-sccs-guidance",
+        label: "EDPB Guidelines on Standard Contractual Clauses for International Transfers",
+        url: "https://www.edpb.europa.eu/our-work-tools/documents/public-consultations/2021/recommendations-012020-measures-supplement_en",
+        org: "EDPB",
+      },
+    ],
+    cells: [
+      /* ── Surface (moderate) ──────────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "dsov-surf-1",
+            text: "Present data collection notices and consent controls before AI interactions begin",
+            exec:
+              "GDPR Articles 13-14 and the NIST Privacy Framework Communicate-P function require that data subjects are informed about data collection purposes before processing begins. For agentic AI, this includes prompt data, conversation history, and any inference outputs retained by the platform.",
+            eng:
+              "Display a consent banner or data notice before the first AI interaction that describes: what data is collected (prompts, responses, metadata), processing purposes (inference, improvement, analytics), retention periods, and data subject rights. Store consent records with timestamps and the specific policy version acknowledged. Gate AI interactions on valid consent where required by jurisdiction.",
+          },
+          {
+            id: "dsov-surf-2",
+            text: "Provide self-service data subject rights controls in the user interface",
+            exec:
+              "GDPR Articles 15-22 grant data subjects rights to access, rectify, erase, port, and restrict processing of their personal data. Agentic platforms that lack self-service controls for these rights face compliance risk and manual fulfillment bottlenecks.",
+            eng:
+              "Implement a privacy dashboard where users can: view collected data (prompts, conversation logs, preference models), request export in machine-readable format (JSON, CSV), submit erasure requests that cascade through all data stores, and toggle consent for optional processing (model training, analytics). Route requests through the automated DSAR pipeline.",
+          },
+        ],
+      },
+
+      /* ── Identity (moderate) ─────────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "dsov-id-1",
+            text: "Bind data classification and consent state to authenticated identity for policy enforcement",
+            exec:
+              "Data sovereignty rules are per-subject, not per-request. The identity layer must carry the user's jurisdictional context, consent state, and data classification preferences so downstream layers can enforce the correct policies without re-querying the user.",
+            eng:
+              "Embed jurisdiction, consent flags, and data-classification context in the identity token or session claims. Propagate these claims through all service-to-service calls. Enforce that downstream layers (gateway, tools, memory) evaluate these claims before processing data. Invalidate sessions when consent is withdrawn.",
+          },
+          {
+            id: "dsov-id-2",
+            text: "Enforce purpose limitation by binding data access to declared processing purposes",
+            exec:
+              "GDPR Article 5(1)(b) and ISO/IEC 27701 Clause 7.2.1 require that personal data is collected for specified, explicit purposes and not processed incompatibly. Agents that access data for inference must not silently repurpose it for training or analytics without distinct authorization.",
+            eng:
+              "Define purpose codes (inference, training, analytics, support) in the identity and authorization layer. Bind each data access request to a declared purpose. Enforce purpose-based access controls in the gateway and memory layers — block reads where the declared purpose does not match the data's authorized use. Log purpose-tagged access for audit.",
+          },
+        ],
+      },
+
+      /* ── Orchestration (minimal) ─────────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "dsov-orch-1",
+            text: "Tag orchestration plan steps with data classification and residency requirements",
+            exec:
+              "Multi-step agent plans may handle data of varying sensitivity levels. If the orchestrator does not propagate data classification metadata through the plan, downstream steps may process restricted data on non-compliant infrastructure or transmit it across jurisdictional boundaries.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Runtime (moderate) ──────────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "dsov-rt-1",
+            text: "Enforce data residency at the inference runtime so processing occurs only in approved jurisdictions",
+            exec:
+              "GDPR Article 44 and the EDPB supplementary measures guidelines require that personal data processing respects jurisdictional transfer restrictions. Routing EU personal data to a US-based inference endpoint violates GDPR regardless of encryption in transit.",
+            eng:
+              "Tag runtime environments with geographic jurisdiction. Implement a pre-dispatch policy check that matches the request's data classification and user jurisdiction against the target runtime's clearance. Reject and re-queue requests that would violate residency policy. Maintain a capacity map per jurisdiction and alert when sovereign capacity is insufficient to meet demand.",
+          },
+          {
+            id: "dsov-rt-2",
+            text: "Ensure ephemeral handling of sensitive data during inference with no uncontrolled persistence",
+            exec:
+              "Model inference processes may retain prompt and completion data in GPU memory, swap space, or temporary files. ISO/IEC 27701 Clause 7.4.5 requires that personal data is not kept longer than necessary. Uncontrolled persistence in the inference runtime creates a data leakage surface.",
+            eng:
+              "Configure inference runtimes to clear GPU memory between requests for sensitive workloads. Disable swap for inference containers processing classified data. Ensure temporary files are encrypted and purged after response delivery. Validate through periodic memory forensics that no PII persists beyond the request lifecycle.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-gw-1",
+            text: "Deploy automated PII detection and redaction at the model gateway before any external model call",
+            exec:
+              "The gateway is the last enforcement point before data leaves the organization's control boundary and reaches a third-party model provider. GDPR Article 28 requires data processing agreements, and ISO/IEC 27701 Clause 8.2.2 mandates controls on sub-processors. PII that reaches a model API without redaction is data the organization cannot recall.",
+            eng:
+              "Deploy a PII detection pipeline (Microsoft Presidio, AWS Comprehend, or a fine-tuned NER model) at the gateway that scans all outbound prompts. Redact or tokenize detected PII before forwarding to external model endpoints. For self-hosted models, apply the same detection on responses. Maintain a configurable detection taxonomy covering names, addresses, phone numbers, SSNs, financial identifiers, health data, and biometric markers. Log all redactions for audit.",
+          },
+          {
+            id: "dsov-gw-2",
+            text: "Enforce cross-border transfer controls with legally valid transfer mechanisms",
+            exec:
+              "GDPR Chapter V prohibits personal data transfers to third countries without adequate safeguards. The Schrems II ruling invalidated Privacy Shield, leaving Standard Contractual Clauses (SCCs), adequacy decisions, and Binding Corporate Rules (BCRs) as primary transfer mechanisms. The gateway must enforce these before routing data.",
+            eng:
+              "Maintain a transfer-mechanism registry mapping each external model endpoint to its legal transfer basis (adequacy decision, SCC, BCR, or derogation). Block requests to endpoints without a valid, unexpired transfer mechanism on file. Implement automated alerts when transfer mechanisms approach expiration. For EU-to-US transfers, verify the endpoint is covered by the EU-US Data Privacy Framework where applicable. Log all cross-border routing decisions with the legal basis applied.",
+          },
+          {
+            id: "dsov-gw-3",
+            text: "Implement data classification-aware routing that matches data sensitivity to endpoint trust levels",
+            exec:
+              "Not all data requires the same protection level. Routing public data through sovereignty controls adds unnecessary latency, while routing confidential data to standard endpoints creates compliance risk. The gateway must match data classification to endpoint trust level.",
+            eng:
+              "Define endpoint trust tiers: sovereign (self-hosted, jurisdiction-verified), trusted (contracted provider with DPA and SCCs), and external (third-party API without data guarantees). Map data classifications (public, internal, confidential, restricted) to minimum required endpoint trust tiers. Enforce the mapping at the gateway routing layer. Log classification-to-tier decisions for compliance audit.",
+          },
+          {
+            id: "dsov-gw-4",
+            text: "Block model training data opt-in by default and enforce contractual no-training clauses",
+            exec:
+              "Third-party model providers may use customer prompt data to improve their models unless explicitly prohibited. GDPR Article 6 requires a lawful basis for processing, and using customer data for model training without consent violates purpose limitation. The gateway must enforce no-training policies at the API level.",
+            eng:
+              "Set API headers or parameters that opt out of model training on all requests to third-party endpoints (e.g., OpenAI's data usage controls, Azure's abuse monitoring opt-out). Verify contractual no-training clauses in DPAs for every external model provider. Monitor provider policy changes for training-data scope creep. Block endpoints where no-training guarantees cannot be verified.",
+          },
+        ],
+      },
+
+      /* ── Tools (critical) ────────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-tool-1",
+            text: "Implement data classification scanning on all tool inputs and outputs",
+            exec:
+              "Tools bridge the AI platform to external systems. Data flowing through tools may contain PII, financial records, or health information that the originating LLM did not flag. Classifying tool data flows prevents uncontrolled transmission of sensitive data to non-compliant destinations.",
+            eng:
+              "Deploy data classification scanners at tool ingress and egress points. Apply the same PII detection taxonomy used at the gateway. Tag classified data with sensitivity labels and propagate labels through the tool execution chain. Block tool outputs that contain restricted data from flowing to unauthorized destinations. Log all classification events.",
+          },
+          {
+            id: "dsov-tool-2",
+            text: "Enforce data minimization in tool queries — request only the fields required for the task",
+            exec:
+              "GDPR Article 5(1)(c) requires data minimization — processing only data adequate, relevant, and limited to what is necessary. Tools that fetch entire database records when only one field is needed create unnecessary exposure of personal data to the AI platform.",
+            eng:
+              "Define field-level access policies for each tool specifying the maximum data scope per use case. Implement query rewriting or field filtering at the tool boundary to strip unnecessary columns before data enters the agent context. Audit tool data requests against minimization policies quarterly. Alert on tools that consistently over-fetch relative to their declared purpose.",
+          },
+          {
+            id: "dsov-tool-3",
+            text: "Ensure tools that write data propagate classification labels and consent status to target systems",
+            exec:
+              "When agents write data back to systems of record through tools, the classification and consent metadata must travel with the data. Otherwise, downstream systems lose the ability to enforce retention, erasure, or access controls on AI-generated content.",
+            eng:
+              "Require all write-capable tools to include data classification labels, source lineage, and consent context in the payload metadata sent to target systems. Validate that target systems acknowledge and store these labels. Reject writes to systems that cannot accept classification metadata. Log all classification-propagation events for DSAR fulfillment.",
+          },
+        ],
+      },
+
+      /* ── Memory (critical) ───────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-mem-1",
+            text: "Classify all data at ingestion into memory stores with sensitivity labels and jurisdictional tags",
+            exec:
+              "ISO/IEC 27701 Clause 7.2.8 requires organizations to identify and classify personal data. AI memory stores — vector databases, conversation logs, learned preferences — contain a mix of public knowledge and personal data. Without classification at ingestion, the organization cannot enforce differential retention, access, or erasure policies.",
+            eng:
+              "Implement a classification pipeline at the memory ingestion boundary that scans content for PII, applies sensitivity labels (public, internal, confidential, restricted, AI-training, prompt-data, inference-data), and tags with source jurisdiction. Store labels as metadata alongside embeddings and documents. Enforce label-based access controls on all retrieval queries. Re-classify periodically to catch drift.",
+          },
+          {
+            id: "dsov-mem-2",
+            text: "Automate data subject access requests (DSARs) across vector stores, conversation logs, and derived embeddings",
+            exec:
+              "GDPR Articles 15-17 require that organizations locate, export, and delete personal data across all processing systems within defined timeframes (typically 30 days). AI memory stores — especially vector databases where personal data is embedded in high-dimensional vectors — make DSAR fulfillment technically challenging but legally non-negotiable.",
+            eng:
+              "Build an automated DSAR pipeline that: (1) identifies all data associated with a subject across vector stores, conversation logs, session state, and derived artifacts, (2) exports identified data in machine-readable format for access requests, (3) deletes or anonymizes data for erasure requests including re-indexing affected vector store partitions, (4) logs fulfillment evidence for regulatory proof. Maintain a data map linking subjects to storage locations. Test DSAR execution quarterly and measure fulfillment latency against SLA.",
+          },
+          {
+            id: "dsov-mem-3",
+            text: "Encrypt memory stores at rest with customer-managed keys and enforce envelope encryption",
+            exec:
+              "GDPR Article 32 requires appropriate technical measures including encryption. ISO/IEC 27701 Clause 6.7 mandates cryptographic controls. Provider-managed encryption keys grant the provider technical access to decrypt — insufficient for data sovereignty. Customer-managed keys with envelope encryption ensure the organization retains exclusive control.",
+            eng:
+              "Encrypt all vector databases, conversation stores, and knowledge bases at rest using AES-256 with keys from a customer-managed HSM (Azure Key Vault, AWS CloudHSM, or on-premises HSM). Implement envelope encryption: generate a data encryption key (DEK) per partition, wrap the DEK with the customer master key (CMK). Rotate CMKs on schedule (annual minimum). Verify that the infrastructure provider cannot access plaintext through key escrow, lawful intercept, or admin access.",
+          },
+          {
+            id: "dsov-mem-4",
+            text: "Enforce data retention policies with automated expiration across all memory tiers",
+            exec:
+              "GDPR Article 5(1)(e) mandates storage limitation — personal data must not be kept longer than necessary. AI platforms accumulate conversation histories, embeddings, and cached inference results that may contain personal data well past their useful life. Without automated retention, the data surface grows indefinitely.",
+            eng:
+              "Define retention schedules per data classification and memory tier: conversation logs (configurable, default 90 days), prompt/completion cache (7 days), vector store chunks (aligned with source document lifecycle), user preference models (until consent withdrawal). Implement automated TTL enforcement that purges expired data including derived embeddings. Log all retention-driven deletions for audit. Alert when retention policies are overridden or disabled.",
+          },
+        ],
+      },
+
+      /* ── State (critical) ────────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-st-1",
+            text: "Classify agent session state by data sensitivity and enforce jurisdictional storage constraints",
+            exec:
+              "Agent session state captures intermediate reasoning, tool outputs, and user context that may include personal data subject to GDPR or sector-specific regulations. State storage must respect the same classification and residency rules as primary data stores.",
+            eng:
+              "Tag all session state with data classification derived from the originating request. Store classified state only in jurisdiction-compliant infrastructure. Implement partition-level isolation so state containing restricted data is physically separated from less sensitive state. Enforce classification checks on state reads to prevent cross-classification access.",
+          },
+          {
+            id: "dsov-st-2",
+            text: "Include agent checkpoint state in DSAR scope and automated erasure pipelines",
+            exec:
+              "Agent checkpoints persist intermediate results and decision context that may reference personal data. GDPR right-to-erasure requests must cover all processing systems, including agent state stores. Omitting checkpoints from DSAR scope creates a compliance gap.",
+            eng:
+              "Register agent state stores in the organization's data map as DSAR-eligible repositories. Implement subject-identifier indexing on checkpoints so associated state can be located during DSAR fulfillment. Cascade erasure requests to checkpoint stores and verify deletion. Log checkpoint erasure events as part of the DSAR fulfillment evidence chain.",
+          },
+          {
+            id: "dsov-st-3",
+            text: "Encrypt session state at rest and in transit with tenant-scoped encryption keys",
+            exec:
+              "Multi-tenant agent platforms store session state from multiple customers in shared infrastructure. ISO/IEC 27701 Clause 6.7 and GDPR Article 32 require technical measures proportionate to risk. Tenant-scoped encryption ensures that a breach of one tenant's key space does not expose another's data.",
+            eng:
+              "Generate per-tenant data encryption keys (DEKs) for session state encryption. Wrap DEKs with the tenant's customer-managed master key. Enforce TLS 1.3 for all state transit. Validate that plaintext state is never written to shared disk without encryption. Rotate DEKs when tenants offboard. Verify encryption coverage through automated compliance scans.",
+          },
+        ],
+      },
+
+      /* ── Observability (moderate) ────────────────────────── */
+      {
+        layerId: "observability",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "dsov-obs-1",
+            text: "Redact PII from observability telemetry before storage and ensure log residency compliance",
+            exec:
+              "Observability logs, traces, and metrics frequently capture prompt text, completion content, and user metadata that constitute personal data under GDPR. Storing unredacted telemetry in a non-compliant jurisdiction or retaining it beyond necessity violates data protection obligations.",
+            eng:
+              "Apply the same PII detection pipeline used at the gateway to all observability data before it is written to storage. Redact or pseudonymize detected PII in log entries, span attributes, and metric labels. Store observability data in jurisdiction-compliant infrastructure. Apply retention policies aligned with data classification — operational logs may have shorter retention than compliance audit logs.",
+          },
+          {
+            id: "dsov-obs-2",
+            text: "Monitor and alert on data sovereignty policy violations across the platform",
+            exec:
+              "NIST Privacy Framework CT.PO-P3 requires monitoring of privacy controls effectiveness. Data sovereignty violations — cross-border transfers without valid mechanisms, unclassified data processing, missed DSAR SLAs — must be detected in near-real-time, not discovered during annual audits.",
+            eng:
+              "Emit structured events for all data sovereignty enforcement decisions: classification results, residency routing, transfer mechanism validation, DSAR fulfillment, and consent state changes. Aggregate events into a privacy compliance dashboard. Set alerts for: unclassified data in production stores, cross-border routing without valid legal basis, DSAR fulfillment approaching SLA deadlines, and consent withdrawal cascades not completing. Feed violations into incident management workflows.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-gov-1",
+            text: "Maintain an AI-specific data classification scheme covering all data types in the agentic platform",
+            exec:
+              "ISO/IEC 27701 Clause 7.2.8 and NIST Privacy Framework ID.IM-P1 require data inventorying and classification. Standard enterprise classification schemes (public, internal, confidential, restricted) are insufficient for AI — they miss AI-specific categories like training data, prompt data, inference outputs, embedding vectors, and conversation history that carry distinct regulatory obligations.",
+            eng:
+              "Extend the enterprise data classification taxonomy with AI-specific categories: training-data, fine-tuning-data, prompt-data, completion-data, inference-metadata, embedding-vector, conversation-history, user-preference-model, and RAG-source-document. Map each category to applicable regulations (GDPR, sector-specific rules), required controls (encryption, residency, retention, consent), and DSAR obligations. Publish the classification scheme as a machine-readable policy and enforce it at all data ingestion points.",
+          },
+          {
+            id: "dsov-gov-2",
+            text: "Enforce consent management for AI training data with granular opt-in and opt-out mechanisms",
+            exec:
+              "GDPR Article 6 requires a lawful basis for processing. Using customer interaction data to fine-tune or improve models requires explicit consent or a legitimate interest assessment. The EU Data Governance Act further regulates data reuse conditions. Without consent management, any model improvement using customer data creates regulatory exposure.",
+            eng:
+              "Implement a consent management platform that tracks per-user, per-purpose consent for AI-specific processing: model training, fine-tuning, evaluation, analytics, and personalization. Enforce consent state at the data pipeline level — block training data extraction for users who have not opted in. Support granular opt-out (e.g., allow inference but prohibit training use). Propagate consent changes to all downstream pipelines within 24 hours. Maintain consent audit logs with version history.",
+          },
+          {
+            id: "dsov-gov-3",
+            text: "Implement data lineage and provenance tracking from source through embedding to agent response",
+            exec:
+              "GDPR Article 30 requires records of processing activities. The NIST Privacy Framework CT.DM-P1 requires data provenance. When an agent produces an output that references personal data, the organization must trace backward through the full processing chain: which source document, which embedding pipeline, which retrieval query, and which model produced the result.",
+            eng:
+              "Assign unique lineage identifiers to every data artifact: source documents, ingestion batches, embedding pipeline versions, vector store chunks, and model inference runs. Propagate lineage IDs through the processing chain. Store lineage metadata in a queryable graph. Enable both forward queries (given a source document, what agent responses did it influence?) and backward queries (given an agent response, what source data contributed?). Integrate lineage into DSAR fulfillment to identify all processing that touched a subject's data.",
+          },
+          {
+            id: "dsov-gov-4",
+            text: "Conduct and maintain Data Protection Impact Assessments for all AI processing activities",
+            exec:
+              "GDPR Article 35 requires DPIAs for processing likely to result in high risk to individuals. Agentic AI systems that profile users, make automated decisions, or process special category data at scale require DPIAs. Without them, the organization lacks a defensible risk assessment for regulatory inquiries.",
+            eng:
+              "Create DPIA templates tailored to agentic AI use cases covering: data flows (prompts, completions, memory, state), automated decision-making scope, profiling activities, cross-border transfers, and data subject impact. Require DPIA completion before any agent deployment that processes personal data. Review DPIAs annually or when processing activities change materially. Store DPIAs in the governance system linked to the agent registry. Integrate DPIA findings into the privacy compliance dashboard.",
+          },
+          {
+            id: "dsov-gov-5",
+            text: "Establish cross-border data transfer governance with validated legal mechanisms for every data flow",
+            exec:
+              "GDPR Chapter V, the Schrems II ruling, and the EDPB supplementary measures guidelines require that every personal data transfer outside the EEA has a valid legal basis. Agentic platforms that route data to model endpoints, vector stores, or tool APIs across jurisdictions must map and validate transfer mechanisms for each flow — not just the primary model API.",
+            eng:
+              "Inventory all data flows that cross jurisdictional boundaries: model API calls, vector store replication, tool API requests, observability telemetry, and backup data. Map each flow to a transfer mechanism (adequacy decision, SCC, BCR, or Article 49 derogation). Automate validation that mechanisms are in place and unexpired before data flows commence. Maintain a transfer impact assessment for high-risk transfers. Alert when a mechanism expires or when a new data flow is created without a mapped mechanism. Report transfer governance status on the privacy compliance dashboard.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (critical) ────────────────────── */
+      {
+        layerId: "systems",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "dsov-sys-1",
+            text: "Enforce data processing agreements and sub-processor controls for all AI-to-system integrations",
+            exec:
+              "GDPR Article 28 requires written data processing agreements (DPAs) between controllers and processors. When agents interact with external systems of record, each integration constitutes a data processing relationship that must be contractually governed. ISO/IEC 27701 Clause 8.2 extends this to sub-processor chains.",
+            eng:
+              "Maintain a DPA registry mapping every agent-to-system integration to its governing data processing agreement. Track sub-processor chains — if the system of record uses third-party infrastructure, validate that the sub-processor chain is documented in the DPA. Block integrations where DPAs are missing, expired, or do not cover AI-specific processing. Alert when new sub-processors are added to existing chains. Audit DPA coverage quarterly.",
+          },
+          {
+            id: "dsov-sys-2",
+            text: "Implement data anonymization and pseudonymization at the integration boundary for analytics and training pipelines",
+            exec:
+              "GDPR Recital 26 excludes truly anonymous data from its scope. Data flowing from systems of record into AI training or analytics pipelines can be anonymized or pseudonymized at the integration boundary, reducing regulatory burden while preserving analytical value. ISO/IEC 27701 Clause 7.4.6 recommends de-identification where possible.",
+            eng:
+              "Deploy anonymization/pseudonymization services at the boundary between systems of record and AI data pipelines. Apply k-anonymity, differential privacy, or tokenization depending on the use case. Validate that anonymized data cannot be re-identified through linkage attacks. For pseudonymized data, store mapping tables in a separate, access-controlled system. Log all anonymization events with the technique applied.",
+          },
+          {
+            id: "dsov-sys-3",
+            text: "Cascade data subject rights requests to all downstream systems touched by agent interactions",
+            exec:
+              "When an agent reads from a CRM, writes to a ticketing system, and logs context to a knowledge base, the data subject's personal data now exists in multiple systems. GDPR Articles 17 and 19 require that erasure and rectification requests propagate to all recipients. Incomplete cascading leaves personal data residue in systems the subject cannot discover.",
+            eng:
+              "Maintain a data flow graph mapping which systems of record are touched by each agent interaction type. When a DSAR is received, traverse the graph to identify all affected systems. Issue cascading erasure or rectification requests to each system with verification callbacks. Track fulfillment status per system and per request. Report incomplete cascades as compliance incidents. Test cascade paths quarterly with synthetic DSARs.",
+          },
+          {
+            id: "dsov-sys-4",
+            text: "Validate data residency compliance for all systems of record that agents access across jurisdictions",
+            exec:
+              "Systems of record hosted in different jurisdictions create indirect cross-border transfer risks when agents access them. An EU-deployed agent querying a US-hosted CRM transfers EU personal data to US jurisdiction. Every agent-to-system integration must be validated against residency requirements, not just the AI platform's own infrastructure.",
+            eng:
+              "Map all systems of record by hosting jurisdiction and data classification. Implement residency validation at the tool/integration layer that checks whether the agent's data classification permits access to the target system's jurisdiction. For cross-jurisdictional access, verify valid transfer mechanisms (SCCs, adequacy decisions) are in place. Block access when no valid mechanism exists. Log all cross-jurisdictional data access with transfer basis for audit.",
+          },
+        ],
+      },
+    ],
+  },
 ];
