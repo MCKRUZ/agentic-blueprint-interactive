@@ -1,0 +1,60 @@
+"use client";
+
+import { LAYERS } from "@/data/layers";
+import type { MatrixCell } from "@/data/types";
+
+const TIER_OPACITY: Record<string, number> = {
+  critical: 1,
+  moderate: 0.5,
+  minimal: 0.15,
+};
+
+interface RelevanceStripProps {
+  cells: MatrixCell[];
+  onClickLayer: (layerId: string) => void;
+}
+
+export function RelevanceStrip({ cells, onClickLayer }: RelevanceStripProps) {
+  const cellMap = new Map(cells.map((c) => [c.layerId, c]));
+
+  return (
+    <div style={{ display: "flex", gap: 3, marginBottom: 24 }}>
+      {LAYERS.map((layer) => {
+        const cell = cellMap.get(layer.id);
+        const tier = cell?.tier ?? "minimal";
+        return (
+          <button
+            key={layer.id}
+            onClick={() => onClickLayer(layer.id)}
+            title={`${layer.name} — ${tier}`}
+            style={{
+              flex: 1,
+              height: 32,
+              borderRadius: 4,
+              border: "1px solid var(--line)",
+              background: layer.ink,
+              opacity: TIER_OPACITY[tier],
+              cursor: "pointer",
+              position: "relative",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                bottom: -18,
+                left: "50%",
+                transform: "translateX(-50%)",
+                fontFamily: "var(--mono)",
+                fontSize: 9,
+                color: "var(--ink-4)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {layer.n}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
