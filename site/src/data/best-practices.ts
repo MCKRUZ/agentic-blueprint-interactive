@@ -416,7 +416,7 @@ export const PILLARS: Pillar[] = [
   {
     id: "ai-governance",
     name: "AI Governance",
-    icon: "⚖",
+    icon: "\u{2696}",
     exec:
       "Autonomous AI agents make decisions at machine speed across enterprise systems, amplifying the consequences of ungoverned behavior. A structured AI governance program — grounded in ISO/IEC 42001, the EU AI Act risk tiers, and the NIST AI RMF GOVERN function — establishes accountability, risk classification, and policy enforcement across every architecture layer. Without it, organizations face regulatory exposure, unauditable decision chains, and reputational risk from unconstrained agent actions.",
     eng:
@@ -465,7 +465,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "The EU AI Act (Article 50) and OECD Transparency Principle require that users know when they are interacting with an AI system. Failure to disclose creates regulatory liability and erodes user trust.",
             eng:
-              "Render a persistent AI disclosure badge on all agent-driven interfaces. Include a link to the system’s AI transparency card describing model capabilities, limitations, and data usage. Log user acknowledgment events for compliance evidence.",
+              "Render a persistent AI disclosure badge on all agent-driven interfaces. Include a link to the system's AI transparency card describing model capabilities, limitations, and data usage. Log user acknowledgment events for compliance evidence.",
           },
           {
             id: "gov-surf-2",
@@ -473,7 +473,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "OECD Principle 1.4 (Human Agency) and ISO 42001 Clause 8.4 require that humans can override AI decisions. Surface-layer controls make this right actionable rather than theoretical.",
             eng:
-              "Implement a visible ‘escalate to human’ control on every agent interaction. Allow users to reject, modify, or request re-evaluation of AI-generated outputs. Record all override events with the original AI recommendation for audit comparison.",
+              "Implement a visible 'escalate to human' control on every agent interaction. Allow users to reject, modify, or request re-evaluation of AI-generated outputs. Record all override events with the original AI recommendation for audit comparison.",
           },
         ],
       },
@@ -497,7 +497,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "Different agent roles carry different risk profiles. An agent that reads data has a fundamentally different governance posture than one that initiates financial transactions. Policies must reflect this stratification.",
             eng:
-              "Map agent roles to EU AI Act risk tiers (high, limited, minimal) and apply corresponding governance controls — high-risk agents require human oversight, conformity assessments, and enhanced logging. Enforce these mappings through the identity layer’s policy engine.",
+              "Map agent roles to EU AI Act risk tiers (high, limited, minimal) and apply corresponding governance controls — high-risk agents require human oversight, conformity assessments, and enhanced logging. Enforce these mappings through the identity layer's policy engine.",
           },
         ],
       },
@@ -519,7 +519,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-orch-2",
             text: "Record complete decision lineage for every orchestration decision",
             exec:
-              "NIST AI RMF GOVERN 1.5 requires traceability of AI decisions. Orchestration is where the model’s reasoning becomes action — the decision lineage here is the backbone of any regulatory audit.",
+              "NIST AI RMF GOVERN 1.5 requires traceability of AI decisions. Orchestration is where the model's reasoning becomes action — the decision lineage here is the backbone of any regulatory audit.",
             eng:
               "Capture and persist the full decision chain: input context, model reasoning (chain-of-thought), selected plan, rejected alternatives, and approval status. Store in an append-only audit store with cryptographic integrity. Make lineage queryable by agent ID, time range, and decision type.",
           },
@@ -553,7 +553,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "ISO 42001 Clause 8.3 requires controlled deployment of AI components. No model should reach production without passing through a documented approval process that validates fitness, bias testing, and regulatory compliance.",
             eng:
-              "Implement a model registry with lifecycle states (draft, approved, deployed, deprecated, retired). Block runtime loading of models not in ‘approved’ or ‘deployed’ state. Require sign-off from both engineering and compliance before state transitions. Log all model version changes.",
+              "Implement a model registry with lifecycle states (draft, approved, deployed, deprecated, retired). Block runtime loading of models not in 'approved' or 'deployed' state. Require sign-off from both engineering and compliance before state transitions. Log all model version changes.",
           },
           {
             id: "gov-rt-2",
@@ -577,7 +577,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "GDPR, the EU AI Act, and sector regulations mandate that certain data categories are processed only within specific jurisdictions. The runtime must enforce these constraints or the entire governance framework is undermined.",
             eng:
-              "Tag each runtime environment with its geographic region and data-classification clearance. Implement a pre-dispatch check that validates the request’s data classification against the target runtime’s clearance. Reject and re-route requests that violate residency rules. Log all routing decisions.",
+              "Tag each runtime environment with its geographic region and data-classification clearance. Implement a pre-dispatch check that validates the request's data classification against the target runtime's clearance. Reject and re-route requests that violate residency rules. Log all routing decisions.",
           },
         ],
       },
@@ -591,9 +591,9 @@ export const PILLARS: Pillar[] = [
             id: "gov-gw-1",
             text: "Enforce responsible-use policies at the model gateway",
             exec:
-              "The gateway is the single chokepoint for all model interactions. Microsoft’s Responsible AI Standard v2 requires that AI systems include mechanisms to prevent misuse. Gateway-level enforcement ensures no request bypasses responsible-use policies.",
+              "The gateway is the single chokepoint for all model interactions. Microsoft's Responsible AI Standard v2 requires that AI systems include mechanisms to prevent misuse. Gateway-level enforcement ensures no request bypasses responsible-use policies.",
             eng:
-              "Deploy a policy enforcement layer at the gateway that evaluates every request against the organization’s responsible-use policy: blocked use cases, required disclaimers, mandatory content safety checks, and prohibited prompt patterns. Return structured denial responses with policy references when requests are blocked.",
+              "Deploy a policy enforcement layer at the gateway that evaluates every request against the organization's responsible-use policy: blocked use cases, required disclaimers, mandatory content safety checks, and prohibited prompt patterns. Return structured denial responses with policy references when requests are blocked.",
           },
           {
             id: "gov-gw-2",
@@ -607,7 +607,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-gw-3",
             text: "Maintain a model catalog with risk classifications and approved-use boundaries",
             exec:
-              "NIST AI RMF GOVERN 1.2 requires an inventory of AI systems with associated risks. The gateway’s model catalog serves as the operational manifestation of this inventory, controlling which models can be used for which purposes.",
+              "NIST AI RMF GOVERN 1.2 requires an inventory of AI systems with associated risks. The gateway's model catalog serves as the operational manifestation of this inventory, controlling which models can be used for which purposes.",
             eng:
               "Maintain a gateway-accessible model catalog recording: model ID, provider, risk classification, approved use cases, prohibited use cases, maximum context window, and data-classification clearance. Reject requests that route to a model outside its approved-use boundary. Sync the catalog with the enterprise AI inventory.",
           },
@@ -623,7 +623,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-tool-1",
             text: "Maintain a governed tool registry with risk classifications and approval status",
             exec:
-              "Every tool an agent can invoke extends the system’s impact surface. ISO 42001 Clause 8.2 requires documented operational procedures. A governed tool registry ensures no unapproved capability enters production.",
+              "Every tool an agent can invoke extends the system's impact surface. ISO 42001 Clause 8.2 requires documented operational procedures. A governed tool registry ensures no unapproved capability enters production.",
             eng:
               "Create a tool registry recording: tool ID, description, risk tier, data access scope, approved agent roles, and last review date. Enforce registry enrollment as a prerequisite for tool availability at runtime. Trigger re-review when tools are modified or their access scope changes.",
           },
@@ -631,7 +631,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-tool-2",
             text: "Require impact assessments for tools that modify external systems",
             exec:
-              "Tools that write data, trigger workflows, or communicate externally carry higher governance burden than read-only tools. The EU AI Act’s conformity assessment requirements extend to the systems AI interacts with, not just the AI itself.",
+              "Tools that write data, trigger workflows, or communicate externally carry higher governance burden than read-only tools. The EU AI Act's conformity assessment requirements extend to the systems AI interacts with, not just the AI itself.",
             eng:
               "Classify tools as read-only, state-modifying, or externally-communicating. Require a documented impact assessment for state-modifying and external tools covering: data affected, reversibility, maximum blast radius, and required human oversight level. Store assessments alongside the tool registry entry.",
           },
@@ -671,7 +671,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-st-1",
             text: "Ensure agent checkpoint state supports reproducibility for regulatory review",
             exec:
-              "EU AI Act Article 12 and NIST AI RMF GOVERN 1.5 require that high-risk AI decisions are reproducible for audit purposes. Checkpoint state must be sufficient to recreate the agent’s decision context at any historical point.",
+              "EU AI Act Article 12 and NIST AI RMF GOVERN 1.5 require that high-risk AI decisions are reproducible for audit purposes. Checkpoint state must be sufficient to recreate the agent's decision context at any historical point.",
             eng: "",
           },
         ],
@@ -742,7 +742,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-gov-3",
             text: "Define and enforce RACI accountability structures for all AI agent operations",
             exec:
-              "NIST AI RMF GOVERN 1.1 and ISO 42001 Clause 5.3 require clearly defined roles and responsibilities for AI systems. Without explicit RACI mappings, accountability defaults to ‘nobody’ when incidents occur.",
+              "NIST AI RMF GOVERN 1.1 and ISO 42001 Clause 5.3 require clearly defined roles and responsibilities for AI systems. Without explicit RACI mappings, accountability defaults to 'nobody' when incidents occur.",
             eng:
               "Create RACI matrices linking each agent role, data domain, and decision type to specific human roles (Responsible, Accountable, Consulted, Informed). Embed RACI references in agent metadata. Surface accountability chains in the governance dashboard. Require RACI assignment as a pre-deployment gate.",
           },
@@ -797,7 +797,7 @@ export const PILLARS: Pillar[] = [
   {
     id: "ai-factory",
     name: "AI Factory (MLOps / LLMOps)",
-    icon: "⚙",
+    icon: "\u{2699}",
     exec:
       "Agentic AI platforms depend on a continuous lifecycle of model development, evaluation, deployment, and monitoring that extends well beyond traditional software CI/CD. Without disciplined MLOps and LLMOps practices — model registries, evaluation pipelines, prompt versioning, drift detection, and embedding management — organizations ship brittle AI that degrades silently in production. The AI Factory pillar establishes the engineering discipline that turns experimental models into reliable, versioned, observable production assets across every architecture layer.",
     eng:
@@ -1012,7 +1012,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "When an agent produces a wrong answer sourced from RAG, teams must trace backward: which document, which chunk, which embedding version, and which retrieval query led to this output? Without lineage, root-cause analysis is impossible and the same failure repeats.",
             eng:
-              "Assign unique IDs to source documents, chunks, and embedding versions. Propagate these IDs through the retrieval pipeline into the agent’s context window. Log the chunk IDs that contributed to each response alongside the model’s output. Enable querying: given a response, show the source documents; given a document, show all responses it influenced.",
+              "Assign unique IDs to source documents, chunks, and embedding versions. Propagate these IDs through the retrieval pipeline into the agent's context window. Log the chunk IDs that contributed to each response alongside the model's output. Enable querying: given a response, show the source documents; given a document, show all responses it influenced.",
           },
         ],
       },
@@ -1026,7 +1026,7 @@ export const PILLARS: Pillar[] = [
             id: "fac-st-1",
             text: "Persist experiment and training run metadata in agent checkpoint state",
             exec:
-              "When fine-tuned or continuously-trained models serve agent workflows, the training provenance (dataset version, hyperparameters, evaluation scores) must be recoverable from the agent’s deployment state for reproducibility and audit.",
+              "When fine-tuned or continuously-trained models serve agent workflows, the training provenance (dataset version, hyperparameters, evaluation scores) must be recoverable from the agent's deployment state for reproducibility and audit.",
             eng: "",
           },
         ],
@@ -1089,7 +1089,7 @@ export const PILLARS: Pillar[] = [
             id: "fac-gov-2",
             text: "Require model cards with standardized documentation for every production model",
             exec:
-              "Model cards (per Hugging Face and Google’s framework) provide the minimum viable documentation for responsible model deployment: intended use, limitations, evaluation results, bias analysis, and training data provenance. Without them, downstream consumers operate blind.",
+              "Model cards (per Hugging Face and Google's framework) provide the minimum viable documentation for responsible model deployment: intended use, limitations, evaluation results, bias analysis, and training data provenance. Without them, downstream consumers operate blind.",
             eng:
               "Generate model cards automatically from training metadata and evaluation results. Require fields: model description, intended use cases, out-of-scope uses, training data summary, evaluation benchmarks with scores, known limitations, and ethical considerations. Store cards alongside model artifacts in the registry. Validate card completeness as a deployment gate.",
           },
@@ -1132,6 +1132,371 @@ export const PILLARS: Pillar[] = [
               "ML pipelines break when upstream systems change schemas, value distributions, or data availability without notice. Data contract validation catches these breaks at ingestion rather than surfacing as mysterious model degradation weeks later.",
             eng:
               "Define data contracts (Great Expectations, Soda, or Pydantic schemas) for every data source consumed by ML pipelines. Validate contracts on every pipeline run: schema checks, null rates, distribution bounds, freshness requirements. Fail pipelines early on contract violations. Notify both the ML team and the upstream data owner when contracts break.",
+          },
+        ],
+      },
+    ],
+  },
+
+  /* ================================================================ */
+  /*  PILLAR 4 — AI Sovereignty                                       */
+  /* ================================================================ */
+  {
+    id: "ai-sovereignty",
+    name: "AI Sovereignty",
+    icon: "\u{1F3DB}",
+    exec:
+      "Dependence on a single cloud provider or model vendor for core AI capabilities creates strategic risk — vendor lock-in, jurisdictional exposure, supply-chain fragility, and loss of competitive differentiation. AI sovereignty ensures an organization retains control over where inference runs, which models it can use, how training data and fine-tunes are governed, and whether it can switch providers without rebuilding the platform. This pillar addresses compute sovereignty, model sovereignty, data jurisdiction, and strategic autonomy across every architecture layer.",
+    eng:
+      "Architect every layer with provider abstraction as a first-class concern. Use standardized inference APIs (OpenAI-compatible endpoints), deploy open-weight models alongside proprietary ones, enforce jurisdictional routing at the gateway, and run sensitive workloads in confidential computing enclaves. Treat model weights, fine-tunes, and embeddings as organizational assets with explicit custody policies. Design for multi-cloud and on-premises deployment from day one — sovereignty is an architectural property, not a migration project.",
+    citations: [
+      {
+        id: "eu-ai-act-sov",
+        label: "EU AI Act — Regulation (EU) 2024/1689",
+        url: "https://artificialintelligenceact.eu/the-act/",
+        org: "European Union",
+      },
+      {
+        id: "gaia-x-framework",
+        label: "Gaia-X — European Data and AI Sovereignty Framework",
+        url: "https://gaia-x.eu/what-is-gaia-x/",
+        org: "Gaia-X AISBL",
+      },
+      {
+        id: "oecd-ai-sov",
+        label: "OECD AI Principles — Inclusive Growth and Sustainable Development",
+        url: "https://oecd.ai/en/ai-principles",
+        org: "OECD",
+      },
+      {
+        id: "azure-confidential",
+        label: "Azure Confidential Computing — Trusted Execution for AI Workloads",
+        url: "https://learn.microsoft.com/en-us/azure/confidential-computing/overview",
+        org: "Microsoft",
+      },
+      {
+        id: "aws-sovereign-cloud",
+        label: "AWS European Sovereign Cloud",
+        url: "https://aws.amazon.com/blogs/security/aws-european-sovereign-cloud/",
+        org: "AWS",
+      },
+    ],
+    cells: [
+      /* ── Surface (minimal) ──────────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "sov-surf-1",
+            text: "Display data residency and inference jurisdiction indicators in the user interface",
+            exec:
+              "Users and compliance officers need visibility into where their data is processed and which jurisdiction governs the AI interaction. Transparency about processing locality builds trust and satisfies EU AI Act Article 13 transparency obligations.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Identity (moderate) ─────────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "sov-id-1",
+            text: "Decouple identity federation from any single cloud provider's IAM",
+            exec:
+              "Binding agent and user identity to a single cloud provider's identity stack creates a hard dependency that blocks multi-cloud and on-premises deployment. Sovereign identity requires provider-neutral federation.",
+            eng:
+              "Implement identity using open standards (OIDC, SAML 2.0, SCIM) with a self-managed or portable identity provider. Avoid provider-proprietary identity features (custom claims, provider-specific roles) that cannot be replicated across clouds. Test identity flows against at least two providers to validate portability.",
+          },
+          {
+            id: "sov-id-2",
+            text: "Enforce jurisdictional constraints on identity token issuance and validation",
+            exec:
+              "Identity tokens that cross jurisdictional boundaries may violate data residency requirements. Token issuance and validation infrastructure must respect the same geographic constraints as data processing.",
+            eng:
+              "Deploy identity endpoints in each required jurisdiction. Configure token issuance to embed jurisdiction metadata. Validate that tokens are consumed only within their designated region. Alert on cross-jurisdictional token usage that violates policy.",
+          },
+        ],
+      },
+
+      /* ── Orchestration (moderate) ────────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "sov-orch-1",
+            text: "Implement provider-agnostic orchestration that can target any compliant runtime",
+            exec:
+              "Orchestration logic that hardcodes provider-specific APIs (Azure OpenAI, Bedrock, Vertex) creates vendor lock-in at the decision-making core of the platform. Sovereign orchestration must be retargetable without rewriting agent logic.",
+            eng:
+              "Abstract model invocation behind a unified interface that accepts standard request formats and routes to pluggable backends. Use open orchestration frameworks (LangChain, Semantic Kernel, or custom abstraction layers) with swappable LLM providers. Validate orchestration behavior is identical across at least two backend providers.",
+          },
+          {
+            id: "sov-orch-2",
+            text: "Support jurisdiction-aware task routing in multi-step agent plans",
+            exec:
+              "Complex agent workflows may span data from multiple jurisdictions. The orchestrator must route individual plan steps to infrastructure that satisfies the jurisdictional requirements of the data being processed, not just the user's location.",
+            eng:
+              "Tag orchestration plan steps with data-classification and jurisdiction metadata. Implement a routing resolver that selects the target runtime based on jurisdictional constraints, data residency rules, and available sovereign infrastructure. Log all routing decisions for audit. Reject plans that cannot be satisfied within compliant infrastructure.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "sov-rt-1",
+            text: "Deploy open-weight models as sovereign alternatives to proprietary APIs",
+            exec:
+              "Exclusive dependence on proprietary model APIs (GPT-4, Claude, Gemini) means a pricing change, terms-of-service update, or service discontinuation can cripple the platform overnight. Open-weight models (Llama, Mistral, Qwen) provide a sovereign fallback that the organization fully controls.",
+            eng:
+              "Maintain deployment-ready open-weight models (Llama 3, Mistral, Mixtral, or domain-specific fine-tunes) on self-managed infrastructure. Benchmark open-weight alternatives against proprietary models for each use case. Implement automatic failover from proprietary APIs to self-hosted models when external endpoints are unavailable or non-compliant.",
+          },
+          {
+            id: "sov-rt-2",
+            text: "Run sensitive inference workloads in confidential computing enclaves",
+            exec:
+              "Standard cloud VMs expose inference data to the cloud operator's privileged software stack. For regulated industries and sovereign AI requirements, confidential computing (TEEs) ensures that neither the cloud provider nor any privileged software can access model inputs, outputs, or weights during processing.",
+            eng:
+              "Deploy inference for sensitive workloads on confidential computing infrastructure (Azure Confidential VMs with AMD SEV-SNP, AWS Nitro Enclaves, or Intel TDX). Verify attestation reports before routing traffic. Encrypt model weights at rest and in transit with keys held in a customer-managed HSM. Benchmark performance overhead and maintain a non-confidential fast path for non-sensitive workloads.",
+          },
+          {
+            id: "sov-rt-3",
+            text: "Enforce compute residency so inference runs only in approved jurisdictions",
+            exec:
+              "Data sovereignty extends to compute — processing EU citizen data on US-jurisdiction GPUs may violate GDPR and the EU AI Act even if the data is encrypted in transit. Compute residency ensures inference runs where policy dictates.",
+            eng:
+              "Tag all runtime nodes with geographic region and jurisdictional clearance. Implement a pre-dispatch admission controller that validates the request's data jurisdiction against the target node's clearance. Reject and re-route requests that violate residency policy. Maintain a real-time inventory of sovereign compute capacity per region. Alert when capacity in a required jurisdiction falls below a safe threshold.",
+          },
+          {
+            id: "sov-rt-4",
+            text: "Retain custody of model weights, fine-tunes, and adapter layers as organizational assets",
+            exec:
+              "Fine-tuned models and LoRA adapters encode proprietary business logic and domain expertise. Hosting them exclusively on a vendor's platform without export rights means losing this intellectual property if the vendor relationship ends.",
+            eng:
+              "Store all model weights, fine-tuned checkpoints, and adapters in organization-controlled storage with defined export procedures. Verify export capability before committing to any training platform. Maintain local copies of all production model artifacts. Include model custody rights in vendor contracts.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "sov-gw-1",
+            text: "Implement a multi-provider model gateway with standardized routing interfaces",
+            exec:
+              "A gateway locked to one model provider is the single biggest sovereignty failure point. A multi-provider gateway with a uniform API contract enables provider switching, cost optimization, and jurisdictional routing without changing any upstream code.",
+            eng:
+              "Deploy a model gateway (LiteLLM, Portkey, or custom) that exposes a unified OpenAI-compatible API and routes to multiple backends — Azure OpenAI, AWS Bedrock, Google Vertex, self-hosted vLLM/TGI, and on-premises endpoints. Implement provider-selection logic based on: cost, latency, jurisdiction, data classification, and availability. Maintain provider health checks and automatic failover.",
+          },
+          {
+            id: "sov-gw-2",
+            text: "Enforce jurisdictional routing policies at the gateway for all model requests",
+            exec:
+              "The gateway is the natural enforcement point for data residency. Every model request must be evaluated against jurisdictional policies before routing — not after. Routing EU-regulated prompts to US endpoints and filtering after the fact does not satisfy GDPR or the EU AI Act.",
+            eng:
+              "Implement a pre-routing policy engine at the gateway that inspects request metadata (user region, data classification, regulatory tags) and selects only model endpoints within compliant jurisdictions. Maintain a jurisdiction-to-endpoint mapping updated by the compliance team. Log all routing decisions. Block requests when no compliant endpoint is available rather than routing to a non-compliant one.",
+          },
+          {
+            id: "sov-gw-3",
+            text: "Monitor and report vendor concentration risk across model consumption",
+            exec:
+              "If 95% of inference traffic flows to a single provider, the organization has nominal multi-provider support but actual single-vendor dependency. Concentration risk must be measured and managed at the gateway, not assumed away by having multiple providers configured.",
+            eng:
+              "Track per-provider traffic share, cost share, and availability metrics at the gateway. Set concentration thresholds (e.g., no single provider exceeds 70% of total inference volume). Alert when thresholds are approached. Report concentration metrics on the governance dashboard. Periodically test failover to secondary providers under realistic load.",
+          },
+          {
+            id: "sov-gw-4",
+            text: "Maintain gateway portability with no proprietary cloud-service dependencies",
+            exec:
+              "A model gateway that depends on a proprietary cloud service (e.g., Azure API Management, AWS API Gateway) for its core routing logic transfers the lock-in problem from the model layer to the infrastructure layer. The gateway itself must be portable.",
+            eng:
+              "Deploy the gateway on portable infrastructure (containers, Kubernetes) using open-source or self-managed components. Avoid embedding cloud-proprietary features (custom policies, managed caching) into the critical routing path. Validate gateway portability by deploying to at least two cloud environments in staging.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ────────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "sov-tool-1",
+            text: "Use open standards and protocols for tool integrations to avoid vendor lock-in",
+            exec:
+              "Tools that integrate via proprietary SDKs or cloud-specific connectors create hidden vendor dependencies. Each proprietary integration is a migration cost that compounds as the tool ecosystem grows.",
+            eng:
+              "Prefer tools that expose standard APIs (REST, GraphQL, MCP, OpenAPI). Wrap proprietary integrations behind an adapter interface so the tool contract is stable regardless of the backing service. Test critical tool integrations against at least two backend implementations.",
+          },
+          {
+            id: "sov-tool-2",
+            text: "Ensure tool execution respects data jurisdictional boundaries",
+            exec:
+              "Tools that call external APIs may transmit data across jurisdictions. A sovereign tool layer must enforce the same residency constraints that govern model inference — the data does not become less regulated because a tool rather than a model processes it.",
+            eng:
+              "Tag tool endpoints with geographic and jurisdictional metadata. Route tool invocations through the same jurisdictional policy engine used by the gateway. Block tool calls that would transmit regulated data to non-compliant endpoints. Log all cross-jurisdictional tool data flows.",
+          },
+        ],
+      },
+
+      /* ── Memory (critical) ───────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "sov-mem-1",
+            text: "Host vector stores and knowledge bases on sovereign infrastructure with jurisdictional controls",
+            exec:
+              "RAG memory stores contain organizational knowledge — often the most sensitive data in the AI platform. Hosting embeddings on a vendor-controlled service with no data residency guarantees exposes the organization to jurisdictional risk and vendor lock-in simultaneously.",
+            eng:
+              "Deploy vector databases (Qdrant, Weaviate, Milvus, or pgvector) on self-managed or sovereign cloud infrastructure. Enforce data residency at the storage layer — embeddings derived from EU data must reside in EU infrastructure. Maintain the ability to migrate vector stores between providers by using open embedding formats and portable database engines.",
+          },
+          {
+            id: "sov-mem-2",
+            text: "Retain custody of all embeddings and ensure embedding model portability",
+            exec:
+              "Embeddings encode proprietary knowledge in vector form. If the embedding model is available only as a vendor API and the vendor changes or discontinues it, the entire knowledge base must be re-embedded — a costly and disruptive process.",
+            eng:
+              "Use open-weight embedding models (BGE, E5, GTE, or Nomic Embed) that can be self-hosted alongside vendor APIs. Store embedding model artifacts locally. Maintain re-indexing pipelines that can regenerate the vector store from source documents when the embedding model changes. Test embedding model migration annually.",
+          },
+          {
+            id: "sov-mem-3",
+            text: "Encrypt memory stores with customer-managed keys not controlled by the infrastructure provider",
+            exec:
+              "Encryption with provider-managed keys does not constitute sovereignty — the provider retains technical access to decrypt. True data sovereignty requires customer-managed encryption keys held in infrastructure the organization controls.",
+            eng:
+              "Encrypt all vector stores and knowledge bases at rest using keys from a customer-managed HSM or key vault deployed in the organization's own infrastructure. Implement envelope encryption so storage-layer encryption is independent of the cloud provider's encryption stack. Rotate keys on a defined schedule and verify that provider-side access to plaintext is cryptographically impossible.",
+          },
+        ],
+      },
+
+      /* ── State (moderate) ────────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "sov-st-1",
+            text: "Store agent checkpoint and session state on portable, jurisdiction-compliant infrastructure",
+            exec:
+              "Agent state includes intermediate reasoning, tool outputs, and user context — all potentially regulated data. State storage must respect the same jurisdictional and portability requirements as all other data layers.",
+            eng:
+              "Deploy state storage on portable database engines (PostgreSQL, Redis, DynamoDB-compatible alternatives) that can run on any cloud or on-premises. Tag state partitions with jurisdiction metadata. Enforce residency at the storage layer. Maintain export and migration procedures for state data to support provider transitions.",
+          },
+          {
+            id: "sov-st-2",
+            text: "Avoid proprietary state serialization formats that create migration barriers",
+            exec:
+              "State serialized in a vendor-specific format (proprietary checkpoint schemas, cloud-specific blob encodings) becomes a migration blocker. When switching providers, state that cannot be deserialized forces cold starts and data loss.",
+            eng:
+              "Use open serialization formats (JSON, Protocol Buffers, Apache Avro) for all agent state persistence. Define and document state schemas explicitly. Test state deserialization across target environments. Include state migration in provider-switch runbooks.",
+          },
+        ],
+      },
+
+      /* ── Observability (moderate) ────────────────────────── */
+      {
+        layerId: "observability",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "sov-obs-1",
+            text: "Use open telemetry standards to avoid observability vendor lock-in",
+            exec:
+              "Observability data — traces, metrics, logs — is critical operational context. Binding it to a proprietary APM vendor means losing historical operational intelligence when switching providers and rebuilding dashboards and alerts from scratch.",
+            eng:
+              "Instrument all platform components using OpenTelemetry (OTLP) for traces, metrics, and logs. Route telemetry through an OpenTelemetry Collector that can fan out to multiple backends (Grafana, Datadog, Azure Monitor, self-hosted Jaeger/Prometheus). Avoid vendor-specific instrumentation SDKs in application code.",
+          },
+          {
+            id: "sov-obs-2",
+            text: "Retain observability data in organization-controlled storage with jurisdictional compliance",
+            exec:
+              "Observability data often contains prompts, completions, and user metadata — all subject to data residency rules. Sending this telemetry to an overseas SaaS observability platform may violate the same regulations the platform itself is designed to satisfy.",
+            eng:
+              "Store observability data in jurisdiction-compliant infrastructure. When using SaaS observability, verify data residency guarantees contractually. For sensitive workloads, deploy self-hosted observability stacks (Grafana + Loki + Tempo + Mimir) in sovereign infrastructure. Apply the same data-classification and retention policies to observability data as to production data.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "sov-gov-1",
+            text: "Establish a multi-provider strategy with documented exit plans for each vendor dependency",
+            exec:
+              "Strategic autonomy requires that no single vendor termination can halt AI operations. The Gaia-X framework and OECD AI Principles both emphasize that organizations must maintain self-determination in their AI capabilities. An exit plan is not pessimism — it is due diligence.",
+            eng:
+              "Document every vendor dependency in the AI platform: model APIs, cloud infrastructure, embedding services, vector databases, observability tools. For each, define: alternative provider, migration effort estimate, data export procedure, and maximum acceptable switchover time. Test the highest-risk exit plan annually. Report vendor dependency status on the governance dashboard.",
+          },
+          {
+            id: "sov-gov-2",
+            text: "Define and enforce a sovereign AI policy covering compute, model, and data jurisdiction",
+            exec:
+              "Without an explicit sovereignty policy, teams make ad-hoc vendor and deployment decisions that accumulate into ungovernable dependency. A codified policy ensures consistent sovereign posture across all teams and workloads.",
+            eng:
+              "Create a machine-readable sovereignty policy covering: approved inference jurisdictions per data classification, minimum open-weight model coverage per use case, maximum single-vendor concentration thresholds, mandatory encryption key custody requirements, and approved cloud regions. Enforce the policy through CI/CD gates and runtime admission controllers. Review and update the policy quarterly as regulations and vendor landscapes evolve.",
+          },
+          {
+            id: "sov-gov-3",
+            text: "Track regulatory sovereignty requirements across all operating jurisdictions",
+            exec:
+              "AI sovereignty obligations vary by jurisdiction — the EU AI Act, national AI strategies, sector-specific regulations, and data localization laws each impose different requirements. A governance layer must map and track these dynamically.",
+            eng:
+              "Maintain a regulatory requirements database mapping jurisdictions to sovereignty obligations: data residency mandates, model transparency requirements, local infrastructure preferences, and cross-border transfer restrictions. Run automated compliance checks comparing the platform's actual deployment posture against required sovereignty controls. Generate jurisdiction-specific compliance reports for regulators.",
+          },
+          {
+            id: "sov-gov-4",
+            text: "Mandate open-weight model evaluation for every new AI use case before committing to proprietary-only",
+            exec:
+              "Defaulting to proprietary APIs without evaluating open alternatives is a governance failure that compounds vendor lock-in. Open-weight models have reached production quality for many use cases and should be the first option considered, not the fallback.",
+            eng:
+              "Require a documented evaluation comparing at least one open-weight model against the proposed proprietary model for every new use case. Record evaluation results (quality, latency, cost, sovereignty posture) in the governance system. Where open-weight models meet quality thresholds, prefer them. Where proprietary models are chosen, document the justification and the exit path.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (critical) ────────────────────── */
+      {
+        layerId: "systems",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "sov-sys-1",
+            text: "Ensure all agent-to-system integrations use portable, standards-based protocols",
+            exec:
+              "Integrations with systems of record built on proprietary cloud connectors (Azure Logic Apps, AWS Step Functions, GCP Workflows) create deep infrastructure lock-in that extends beyond the AI platform into enterprise integration architecture.",
+            eng:
+              "Build agent-to-system integrations using portable protocols (REST, gRPC, GraphQL, AMQP, CloudEvents). Wrap cloud-proprietary connectors behind an adapter layer with a stable interface. Test critical integrations against mock backends that simulate alternative infrastructure. Include integration portability in sovereignty compliance audits.",
+          },
+          {
+            id: "sov-sys-2",
+            text: "Enforce data sovereignty at the integration boundary when agents access external systems",
+            exec:
+              "When agents read from or write to systems of record, data crosses trust boundaries. If the system of record is in a different jurisdiction or hosted by a third party, the integration must enforce the same sovereignty controls as the AI platform itself.",
+            eng:
+              "Classify all system-of-record integrations by jurisdiction and data sensitivity. Route cross-jurisdictional data flows through sovereignty policy enforcement points. Implement data minimization — agents should request only the fields they need, not entire records. Log all cross-boundary data transfers with jurisdiction metadata for audit.",
+          },
+          {
+            id: "sov-sys-3",
+            text: "Maintain the ability to operate core AI capabilities independently of external system availability",
+            exec:
+              "If the AI platform cannot function when a single external system or cloud service is unavailable, it lacks operational sovereignty. Core capabilities — inference, orchestration, memory retrieval — must degrade gracefully, not fail completely.",
+            eng:
+              "Implement circuit-breakers and cached fallbacks for all external system integrations. Define a minimum viable capability set that operates using only self-managed infrastructure. Test this degraded mode quarterly. Document recovery procedures for restoring full connectivity after external system outages.",
           },
         ],
       },
