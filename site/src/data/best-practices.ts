@@ -1891,4 +1891,374 @@ export const PILLARS: Pillar[] = [
       },
     ],
   },
+  {
+    id: "agentic-orchestration",
+    name: "Agentic Orchestration",
+    icon: "\u{1F500}",
+    exec:
+      "Multi-agent systems introduce coordination complexity that exceeds what single-agent architectures encounter. Agents must discover each other's capabilities, negotiate task decomposition, share context without exceeding token budgets, and recover gracefully when a participant fails mid-workflow. Without explicit orchestration discipline — covering supervisor hierarchies, plan validation, delegation trust boundaries, and lifecycle management — multi-agent deployments degrade into unpredictable, undebuggable chains of autonomous actions with compounding failure rates.",
+    eng:
+      "Implement orchestration as a first-class architectural concern, not an emergent property of agent prompts. Define explicit topology patterns (supervisor, plan-and-execute, pipeline, swarm) per workflow type. Enforce delegation policies through code — not prompt instructions — so that agent authority boundaries survive adversarial inputs. Instrument every agent-to-agent handoff with distributed trace context. Checkpoint workflow state at each orchestration step to enable resume-after-failure without replaying the full chain.",
+    citations: [
+      {
+        id: "anthropic-agents",
+        label: "Building Effective Agents — Anthropic Engineering",
+        url: "https://www.anthropic.com/engineering/building-effective-agents",
+        org: "Anthropic",
+      },
+      {
+        id: "langgraph-docs",
+        label: "LangGraph — Multi-Actor Agent Framework",
+        url: "https://langchain-ai.github.io/langgraph/",
+        org: "LangChain",
+      },
+      {
+        id: "autogen-framework",
+        label: "AutoGen — Multi-Agent Conversation Framework",
+        url: "https://microsoft.github.io/autogen/",
+        org: "Microsoft",
+      },
+      {
+        id: "google-a2a",
+        label: "Agent2Agent (A2A) Protocol Specification",
+        url: "https://google.github.io/A2A/",
+        org: "Google",
+      },
+      {
+        id: "crewai-docs",
+        label: "CrewAI — Multi-Agent Orchestration Framework",
+        url: "https://docs.crewai.com/",
+        org: "CrewAI",
+      },
+    ],
+    cells: [
+      /* ── Surface (moderate) ──────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "ao-surf-1",
+            text: "Surface agent delegation status and active-agent identity to the user in real time",
+            exec:
+              "When a supervisor agent delegates to specialist sub-agents, users lose visibility into who is handling their request and why. Opaque delegation erodes trust and makes it impossible for users to intervene when an agent takes an unexpected path.",
+            eng:
+              "Emit delegation events over a WebSocket or SSE channel that the UI consumes to render a live agent-activity indicator — showing which agent is active, what task it is performing, and how it relates to the user's original request. Include a 'cancel delegation' affordance for long-running sub-agent tasks.",
+          },
+          {
+            id: "ao-surf-2",
+            text: "Provide a human-in-the-loop approval gate for high-impact delegated actions",
+            exec:
+              "Certain agent-to-agent delegations result in actions with real-world consequences — financial transactions, data mutations, external communications. The user must be able to review and approve these before execution, even when the action was planned by a sub-agent two levels deep in the delegation chain.",
+            eng:
+              "Implement an approval-queue component that intercepts delegated actions tagged as high-impact by the orchestrator's risk classifier. Render the proposed action, its originating agent, the delegation chain, and expected consequences. Block execution until the user explicitly approves or rejects.",
+          },
+        ],
+      },
+
+      /* ── Identity (moderate) ─────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "ao-id-1",
+            text: "Assign distinct identities to each agent in a multi-agent workflow",
+            exec:
+              "When multiple agents share a single service identity, audit trails collapse — you cannot distinguish which agent made a tool call, consumed tokens, or triggered an error. Distinct agent identities are the foundation for accountability, rate limiting, and forensic analysis in multi-agent systems.",
+            eng:
+              "Issue a unique agent identity (service principal or scoped JWT) per agent instance at spawn time. Bind the identity to the originating user session and the orchestration trace. Propagate the agent identity through all downstream calls — tool invocations, memory reads, state writes — so every action is attributable to a specific agent within a specific workflow.",
+          },
+          {
+            id: "ao-id-2",
+            text: "Enforce delegation trust boundaries through identity-scoped permission sets",
+            exec:
+              "A supervisor agent should not be able to grant a sub-agent more permissions than it holds itself. Without explicit trust-boundary enforcement, delegation chains can inadvertently escalate privileges — a research agent delegates to a code-execution agent that inherits write access the research agent was never meant to have.",
+            eng:
+              "Implement a delegation policy engine that computes the intersection of the delegating agent's permissions and the target agent's role permissions. The delegated agent receives the lesser of the two. Store delegation policies as declarative rules (not prompt instructions) evaluated at delegation time. Log all delegation events with the computed permission set for audit.",
+          },
+        ],
+      },
+
+      /* ── Orchestration (critical) ────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-orch-1",
+            text: "Select orchestration topology explicitly per workflow type rather than defaulting to a single pattern",
+            exec:
+              "Supervisor, plan-and-execute, pipeline, and swarm topologies each optimize for different workflow characteristics. A single-pattern default — typically supervisor — leads to bottlenecks for parallelizable work and unnecessary complexity for sequential tasks. Topology selection should be a deliberate architectural decision, not an accident of the first agent framework adopted.",
+            eng:
+              "Define a topology registry mapping workflow types to orchestration patterns: supervisor for hierarchical control with human oversight, plan-and-execute for decomposable multi-step reasoning, pipeline for sequential data-transformation chains, swarm for parallel independent subtasks. Implement each topology as a reusable orchestration template. Select topology at workflow-initiation time based on task classification.",
+          },
+          {
+            id: "ao-orch-2",
+            text: "Validate agent execution plans before dispatching sub-tasks",
+            exec:
+              "In plan-and-execute patterns, the planning agent decomposes a goal into a sequence of sub-tasks and assigns them to specialist agents. If the plan is executed without validation, an adversarial or hallucinated plan can invoke dangerous tool sequences, allocate unbounded resources, or create circular delegation chains.",
+            eng:
+              "Implement a plan-validation middleware that checks proposed execution plans against constraints: maximum delegation depth, permitted tool combinations per agent role, budget ceilings (tokens, API calls, wall-clock time), and cycle detection in the delegation graph. Reject invalid plans with structured error feedback to the planning agent. Log all plan submissions and validation outcomes.",
+          },
+          {
+            id: "ao-orch-3",
+            text: "Implement circuit-breaking and fallback strategies for agent failures",
+            exec:
+              "In multi-agent workflows, a single agent failure can cascade — a stalled sub-agent blocks the supervisor, which times out, which leaves the user request in limbo. Without explicit failure recovery, multi-agent systems are less reliable than single-agent alternatives despite their greater capability.",
+            eng:
+              "Apply circuit-breaker patterns at each delegation boundary: if a sub-agent fails or exceeds its time/token budget, the orchestrator trips the circuit and executes a fallback strategy — retry with a different agent, degrade to a simpler single-agent path, or return a partial result with an explanation. Configure failure thresholds per agent role. Track failure rates to identify chronically unreliable agents.",
+          },
+          {
+            id: "ao-orch-4",
+            text: "Enforce maximum delegation depth and fan-out limits to prevent runaway agent spawning",
+            exec:
+              "Without explicit limits, a supervisor agent can delegate to sub-agents that delegate to further sub-agents, creating exponential fan-out. This exhausts compute resources, inflates costs, and produces trace trees too deep to debug. Unbounded spawning is the multi-agent equivalent of a fork bomb.",
+            eng:
+              "Set hard limits on delegation depth (typically 3-4 levels) and fan-out (concurrent sub-agents per parent). Enforce limits in the orchestration runtime, not in agent prompts — prompts can be circumvented. When limits are reached, the orchestrator must consolidate remaining work into the current agent rather than delegating further. Emit alerts when workflows approach limits.",
+          },
+        ],
+      },
+
+      /* ── Runtime (critical) ──────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-rt-1",
+            text: "Manage agent lifecycle explicitly — spawn, monitor, and terminate agents through the runtime",
+            exec:
+              "Agents in a multi-agent system are not fire-and-forget. Without lifecycle management, orphaned agents consume resources indefinitely, zombie agents hold locks on shared state, and there is no mechanism to drain in-flight workflows during deployment. The runtime must own the full agent lifecycle.",
+            eng:
+              "Implement an agent registry in the runtime that tracks all active agent instances, their parent orchestrator, current task, resource consumption, and heartbeat status. Support graceful termination (finish current step, checkpoint, exit) and forced termination (immediate kill with state rollback). Implement TTL-based garbage collection for agents that stop heartbeating. Expose lifecycle APIs for orchestrators to spawn, query, and terminate sub-agents.",
+          },
+          {
+            id: "ao-rt-2",
+            text: "Isolate agent execution contexts to prevent cross-agent interference",
+            exec:
+              "When multiple agents run within the same process or share execution resources, a misbehaving agent — one that leaks memory, monopolizes CPU, or corrupts shared state — can degrade all co-located agents. Isolation is required for both reliability and security.",
+            eng:
+              "Run each agent in an isolated execution context — separate containers, sandboxed processes, or at minimum isolated memory spaces with resource quotas (CPU, memory, network). Prevent agents from directly accessing another agent's memory, tool handles, or in-flight state. Route all inter-agent communication through the orchestration layer, never through shared mutable state.",
+          },
+          {
+            id: "ao-rt-3",
+            text: "Implement token and cost budgets per agent with runtime enforcement",
+            exec:
+              "Individual agents have no incentive to minimize token consumption — they optimize for task completion. Without runtime-enforced budgets, a verbose agent or a retry loop can burn through API credits in minutes. Cost governance must be a runtime concern, not an agent-level prompt instruction.",
+            eng:
+              "Track cumulative token usage per agent instance and per workflow. Enforce per-agent token ceilings and per-workflow cost budgets at the LLM gateway layer. When an agent approaches its budget, inject a summarization step to compress context rather than allowing unbounded growth. When the budget is exceeded, trigger the orchestrator's fallback strategy rather than hard-killing the agent mid-task.",
+          },
+          {
+            id: "ao-rt-4",
+            text: "Support graceful workflow draining during deployments and scaling events",
+            exec:
+              "Multi-agent workflows can span minutes or hours. Deploying a new version of the runtime or scaling down infrastructure must not orphan in-flight workflows. Without graceful draining, deployments become a source of data loss and user-facing errors.",
+            eng:
+              "Implement a drain mode that stops accepting new workflows while allowing in-flight workflows to complete up to a configurable deadline. Checkpoint long-running workflows at the current orchestration step so they can resume on the new runtime version. Use health-check endpoints that report drain status to load balancers.",
+          },
+        ],
+      },
+
+      /* ── Gateway (moderate) ──────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "ao-gw-1",
+            text: "Route agent LLM requests through a unified gateway with per-agent traffic shaping",
+            exec:
+              "In multi-agent systems, multiple agents compete for LLM API capacity simultaneously. Without traffic shaping, a burst of concurrent agent requests can hit provider rate limits, causing cascading failures across all agents in the workflow.",
+            eng:
+              "Route all agent LLM calls through a shared API gateway that enforces per-agent and per-workflow rate limits, implements priority queuing (supervisor agents get priority over leaf agents), and provides automatic retry with exponential back-off. Track per-agent request volume and latency for capacity planning.",
+          },
+          {
+            id: "ao-gw-2",
+            text: "Implement model routing to assign appropriate model tiers to different agent roles",
+            exec:
+              "Not every agent in a multi-agent workflow needs the most capable (and expensive) model. A classification agent, a summarization agent, and a planning agent have different capability requirements. Routing all agents to the same model wastes cost on simple tasks and may under-serve complex ones.",
+            eng:
+              "Define a model-routing policy that maps agent roles to model tiers: planning and reasoning agents to high-capability models, extraction and formatting agents to smaller/faster models, and validation agents to specialized fine-tuned models where available. Evaluate routing decisions against task-completion quality metrics and adjust thresholds.",
+          },
+        ],
+      },
+
+      /* ── Tools (critical) ────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-tool-1",
+            text: "Scope tool permissions per agent role — no agent should access tools beyond its task requirements",
+            exec:
+              "In multi-agent systems, each agent has a specific role (researcher, coder, reviewer). Granting all agents access to all tools violates least privilege and creates a blast radius where a compromised or confused agent can invoke any tool in the platform. Tool scoping is the primary mechanism for constraining agent authority.",
+            eng:
+              "Define tool-permission sets per agent role in a declarative policy file. At agent spawn time, the runtime injects only the permitted tool definitions into the agent's system prompt and registers runtime-level enforcement that rejects calls to unpermitted tools. Never rely solely on prompt-level tool restriction — always enforce at the runtime layer.",
+          },
+          {
+            id: "ao-tool-2",
+            text: "Implement capability discovery so agents can find available tools and peer agents dynamically",
+            exec:
+              "Hardcoding tool and agent references into prompts creates brittle orchestration that breaks when tools are added, removed, or versioned. The A2A protocol and similar standards define capability-discovery mechanisms that let agents find what they need at runtime.",
+            eng:
+              "Implement an agent-card and tool-manifest registry that agents query at task-initiation time. Each entry declares capabilities, input/output schemas, version, and access requirements. Support semantic search over capability descriptions so planning agents can discover relevant tools without hardcoded lists. Version manifests to ensure agents bind to compatible tool versions.",
+          },
+          {
+            id: "ao-tool-3",
+            text: "Enforce tool-call rate limits and concurrency controls per agent instance",
+            exec:
+              "An agent in a retry loop or an overly ambitious plan can issue hundreds of tool calls in seconds, overwhelming downstream services. Per-agent tool-call throttling prevents a single agent from monopolizing shared infrastructure.",
+            eng:
+              "Apply per-agent-instance rate limits on tool invocations at the tool-execution layer. Implement concurrency limits for tools that access shared resources (databases, external APIs). Queue excess calls with back-pressure signaling to the orchestrator so it can adjust the plan rather than stalling silently.",
+          },
+        ],
+      },
+
+      /* ── Memory (critical) ──────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-mem-1",
+            text: "Implement shared memory with access-control boundaries between agents",
+            exec:
+              "Multi-agent workflows require shared context — the research agent's findings must be available to the synthesis agent. But unrestricted shared memory allows any agent to read or overwrite any other agent's context, creating data-integrity risks and information leakage between agent roles that should be isolated.",
+            eng:
+              "Implement a shared-memory layer (vector store or key-value store) with namespace isolation per agent and a shared namespace for orchestrator-mediated data exchange. Agents write to their own namespace and to designated shared slots; they read from shared slots and their own namespace only. The orchestrator controls which shared slots each agent can access. Log all cross-namespace reads for audit.",
+          },
+          {
+            id: "ao-mem-2",
+            text: "Implement context-window management strategies to prevent token exhaustion in long workflows",
+            exec:
+              "Multi-agent workflows accumulate context across delegation steps — the supervisor's plan, each sub-agent's findings, tool outputs, and error messages. Without active context management, the accumulated context exceeds model context windows, causing silent truncation or outright failures.",
+            eng:
+              "Apply a context-management strategy at each delegation boundary: summarize completed sub-task outputs before injecting them into the next agent's context, use sliding-window approaches for iterative workflows, and offload detailed results to retrievable memory (RAG) while keeping only summaries in the active context. Monitor per-agent context utilization and alert when approaching window limits.",
+          },
+          {
+            id: "ao-mem-3",
+            text: "Scope memory retention policies per agent role and workflow sensitivity",
+            exec:
+              "Not all agent memory should persist equally. A customer-service agent's conversation memory has different retention requirements than a code-generation agent's scratch space. Blanket retention policies either waste storage or violate data-minimization principles.",
+            eng:
+              "Define retention tiers: ephemeral (cleared at agent termination), workflow-scoped (cleared at workflow completion), session-scoped (cleared at user session end), and persistent (retained for learning or audit). Assign default retention tiers per agent role. Allow orchestrators to override retention for specific workflows. Implement automated cleanup jobs that enforce retention policies.",
+          },
+        ],
+      },
+
+      /* ── State (critical) ────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-st-1",
+            text: "Checkpoint workflow state at every orchestration boundary for resume-after-failure",
+            exec:
+              "Multi-agent workflows can span minutes or hours. A failure at step 8 of a 10-step workflow should not require replaying steps 1-7. Without state checkpointing, every failure restarts the entire workflow, wasting compute, time, and cost.",
+            eng:
+              "Persist a workflow-state snapshot at each orchestration decision point — after plan generation, after each sub-agent completion, after each tool-call result. Store checkpoints in a durable state backend (Redis with persistence, PostgreSQL, or a dedicated workflow engine like Temporal). Include the full orchestration context: completed steps, pending steps, accumulated results, and current agent assignments. Implement a resume API that reconstitutes a workflow from its latest checkpoint.",
+          },
+          {
+            id: "ao-st-2",
+            text: "Version workflow state schemas to support rolling upgrades of agent logic",
+            exec:
+              "When agent logic or orchestration patterns are updated, in-flight workflows carry state written by the previous version. If the new code cannot deserialize old state, checkpointed workflows become unresumable — defeating the purpose of checkpointing.",
+            eng:
+              "Include a schema version in every state checkpoint. Implement forward-compatible state migrations that can upgrade checkpoint state from version N to version N+1. Test state migrations as part of the CI pipeline. When a breaking migration is unavoidable, drain in-flight workflows before deploying.",
+          },
+          {
+            id: "ao-st-3",
+            text: "Implement distributed locking for state accessed by concurrent agents",
+            exec:
+              "When multiple agents in a swarm or parallel-execution topology read and write shared workflow state concurrently, race conditions corrupt state — two agents may both claim the same sub-task, or one agent's result may overwrite another's. Distributed locking prevents these conflicts.",
+            eng:
+              "Use a distributed lock manager (Redis Redlock, etcd lease, or database advisory locks) to serialize writes to shared workflow state. Keep lock granularity fine — lock per state key, not per workflow — to maximize concurrency. Set lock TTLs shorter than agent heartbeat intervals to prevent deadlocks from crashed agents. Implement optimistic concurrency control as a fallback for non-critical state updates.",
+          },
+        ],
+      },
+
+      /* ── Observability (critical) ────────────────────── */
+      {
+        layerId: "observability",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "ao-obs-1",
+            text: "Propagate distributed trace context through all agent-to-agent and agent-to-tool calls",
+            exec:
+              "Multi-agent workflows create tree-shaped execution traces where a single user request fans out into multiple agent invocations, tool calls, and LLM requests. Without distributed tracing, debugging a failure requires manually correlating logs across agents — a process that does not scale beyond trivial workflows.",
+            eng:
+              "Adopt OpenTelemetry trace propagation across all orchestration boundaries. Each agent invocation creates a child span linked to its parent agent's span. Attach workflow ID, agent ID, agent role, and delegation depth as span attributes. Ensure tool calls, LLM requests, and memory operations inherit the trace context. Export traces to a backend that supports tree visualization (Jaeger, Grafana Tempo).",
+          },
+          {
+            id: "ao-obs-2",
+            text: "Track per-agent and per-workflow cost metrics in real time",
+            exec:
+              "Multi-agent workflows have opaque cost profiles — a single user request may invoke 5 agents, 20 LLM calls, and 50 tool invocations. Without per-agent cost attribution, you cannot identify which agents or workflows drive cost and where optimization efforts should focus.",
+            eng:
+              "Instrument every LLM call and tool invocation with token counts, model tier, and estimated cost. Aggregate costs per agent instance, per agent role, and per workflow. Publish cost metrics to a real-time dashboard with alerting on per-workflow budget thresholds. Use cost data to inform model-routing decisions and identify agents that should be replaced with cheaper alternatives.",
+          },
+          {
+            id: "ao-obs-3",
+            text: "Log agent reasoning traces alongside execution traces for post-hoc analysis",
+            exec:
+              "Execution traces show what happened; reasoning traces show why. When a multi-agent workflow produces an incorrect result, understanding the failure requires seeing each agent's chain-of-thought, the orchestrator's plan, and the decision points where delegation occurred. Without reasoning traces, root-cause analysis is guesswork.",
+            eng:
+              "Capture and store the planning agent's generated plan, each agent's chain-of-thought (or scratchpad), tool-call decisions with rationale, and the orchestrator's delegation decisions. Link reasoning traces to the corresponding execution spans via trace ID. Implement a review UI that replays a workflow step-by-step with both execution and reasoning context visible.",
+          },
+        ],
+      },
+
+      /* ── Governance (moderate) ───────────────────────── */
+      {
+        layerId: "governance",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "ao-gov-1",
+            text: "Register all agent types in a governance catalog with capability declarations and risk classifications",
+            exec:
+              "A multi-agent platform can accumulate dozens of agent types over time. Without a governance catalog, there is no authoritative inventory of what agents exist, what they can do, who owns them, or what risk tier they fall into. This makes compliance audits, incident response, and capability planning impossible.",
+            eng:
+              "Maintain a machine-readable agent catalog that records each agent type's name, capabilities, permitted tools, delegation authority (can it spawn sub-agents?), risk classification, owning team, and deployment environments. Enforce catalog enrollment as a pre-deployment gate. Expose the catalog via API for governance dashboards and automated compliance checks.",
+          },
+          {
+            id: "ao-gov-2",
+            text: "Enforce orchestration-pattern guardrails through policy-as-code rather than prompt engineering",
+            exec:
+              "Governance constraints expressed only in agent prompts — 'do not delegate to more than 3 sub-agents' — are suggestions, not enforcement. Prompts can be overridden by adversarial inputs, ignored during high-temperature sampling, or lost during context-window truncation. Policy enforcement must live outside the model.",
+            eng:
+              "Define orchestration governance rules (max delegation depth, permitted agent-to-agent delegation pairs, required approval gates, budget ceilings) in a declarative policy engine (OPA, Cedar, or custom). Evaluate policies at the runtime layer before executing delegation decisions. Log policy evaluations with the rule matched and the outcome. Update policies through version-controlled pull requests, not runtime configuration changes.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "ao-sys-1",
+            text: "Implement agent-aware integration adapters that enforce per-agent access policies on systems of record",
+            exec:
+              "When multiple agents access the same system of record (CRM, ERP, ticketing system), each agent should only access the data relevant to its role. A research agent querying a CRM should not have the same access as an admin agent performing bulk updates. Integration adapters must be agent-identity-aware.",
+            eng:
+              "Wrap each system-of-record integration in an adapter that reads the calling agent's identity and role, then applies row-level and field-level access filters before returning data. Use the agent's scoped credentials (from the identity layer) to enforce access at the system-of-record level where possible. Log all agent-to-system interactions with the agent identity, query, and data classification of returned records.",
+          },
+          {
+            id: "ao-sys-2",
+            text: "Coordinate multi-agent writes to systems of record through a transaction coordinator to prevent conflicts",
+            exec:
+              "When multiple agents in a workflow write to the same system of record — one agent updates a ticket status while another appends notes — uncoordinated writes can create inconsistent state. This is especially dangerous when agents operate on stale reads due to eventual consistency.",
+            eng:
+              "Implement a transaction coordinator at the orchestration layer that serializes writes to the same system-of-record entity within a workflow. Use optimistic concurrency control (version fields, ETags) when the system of record supports it. When concurrent writes conflict, route the conflict to the orchestrator for resolution rather than silently overwriting. Log all write conflicts with the involved agents and resolution outcome.",
+          },
+        ],
+      },
+    ],
+  },
 ];
