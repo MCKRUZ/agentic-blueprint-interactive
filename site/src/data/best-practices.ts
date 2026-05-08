@@ -2983,4 +2983,328 @@ export const PILLARS: Pillar[] = [
     ],
   },
 
+
+  /* ================================================================
+   *  9. COST MANAGEMENT
+   * ================================================================ */
+  {
+    id: "cost-management",
+    name: "Cost Management",
+    icon: "◎",
+    exec:
+      "LLM inference is the dominant variable cost in agentic platforms, and it scales non-linearly with agent complexity — multi-step reasoning, tool-calling loops, and RAG augmentation multiply token consumption per user request. Without disciplined cost management spanning model selection, prompt optimization, caching, and tenant-level attribution, AI spend becomes unpredictable and unaccountable. A FinOps-for-AI practice must be embedded across every architecture layer, treating tokens as a metered resource with the same rigor applied to cloud compute and storage.",
+    eng:
+      "Cost management in agentic systems requires instrumentation at the gateway for metering, policy enforcement at the orchestration layer for budget controls, and optimization techniques at every layer that touches LLM inference. Implement model tiering to route requests to the cheapest capable model, prompt caching to eliminate redundant token processing, semantic caching to serve repeated intents from cache, and context-window right-sizing to avoid paying for unused capacity. Attribute all costs to tenants, agents, and workflows using gateway telemetry. Set budget guardrails with circuit-breakers that degrade gracefully rather than failing hard.",
+    citations: [
+      {
+        id: "azure-waf-ai-cost",
+        label: "Azure Well-Architected Framework — Cost Optimization for AI Workloads",
+        url: "https://learn.microsoft.com/en-us/azure/well-architected/ai/cost",
+        org: "Microsoft",
+      },
+      {
+        id: "finops-ai",
+        label: "FinOps Foundation — AI Cost Management Working Group",
+        url: "https://www.finops.org/wg/ai-cost-management/",
+        org: "FinOps Foundation",
+      },
+      {
+        id: "anthropic-prompt-caching",
+        label: "Anthropic — Prompt Caching Documentation",
+        url: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching",
+        org: "Anthropic",
+      },
+      {
+        id: "openai-pricing",
+        label: "OpenAI — API Pricing and Token Economics",
+        url: "https://openai.com/api/pricing/",
+        org: "OpenAI",
+      },
+      {
+        id: "aws-genai-cost",
+        label: "AWS — Cost Optimization for Generative AI Workloads",
+        url: "https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/cost-optimization.html",
+        org: "AWS",
+      },
+    ],
+    cells: [
+      /* ── Surface (moderate) ──────────────────────── */
+      {
+        layerId: "surface",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "cost-surf-1",
+            text: "Implement token-aware UX patterns that minimize unnecessary inference cost",
+            exec:
+              "Every user interaction that triggers an LLM call consumes tokens. Auto-submit on keystroke, speculative pre-generation, and unbounded conversation histories inflate costs without proportional user value. The UI must be designed to elicit high-signal, well-scoped prompts that reduce wasted inference.",
+            eng:
+              "Use explicit submit actions instead of auto-triggering inference. Display estimated token cost or complexity indicator before submission for high-cost operations. Implement conversation-history truncation or summarization in the UI layer to prevent unbounded context growth. Offer suggested prompts and templates that guide users toward efficient query patterns. Track cost-per-interaction at the UI level and surface it in analytics dashboards.",
+          },
+          {
+            id: "cost-surf-2",
+            text: "Use streaming responses with early termination to avoid paying for unwanted output",
+            exec:
+              "Users frequently abandon or redirect long-form AI responses mid-stream. Without early termination, the platform pays for completion tokens the user never reads. Streaming with cancellation support converts wasted output tokens into direct cost savings.",
+            eng:
+              "Implement SSE or WebSocket streaming for all LLM responses. Provide a visible stop/cancel button that sends an abort signal propagated to the LLM gateway. Track early-termination rates per workflow type — high rates indicate over-generation that can be addressed by tuning max_tokens or response-length instructions in the system prompt.",
+          },
+        ],
+      },
+
+      /* ── Identity (minimal) ──────────────────────── */
+      {
+        layerId: "identity",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "cost-id-1",
+            text: "Bind cost quotas and tier entitlements to authenticated identity for per-tenant budget enforcement",
+            exec:
+              "Cost controls that operate without identity context cannot enforce per-tenant budgets, tiered pricing plans, or usage-based billing. Identity is the key that links every inference request to a billable entity and its associated spending limits.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Orchestration (critical) ──────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "cost-orch-1",
+            text: "Implement model tiering — route each task to the cheapest model that meets its quality threshold",
+            exec:
+              "Not every agent task requires frontier-model capabilities. Classification, extraction, and simple summarization can be handled by smaller, cheaper models at 10-50x lower cost per token. Routing all tasks to a single high-end model wastes budget on work that simpler models handle equally well. Model tiering is typically the single highest-impact cost optimization in agentic platforms.",
+            eng:
+              "Define a task-complexity classifier at the orchestration layer that categorizes each sub-task (e.g., simple extraction, multi-step reasoning, creative generation, code synthesis). Maintain a model-tier configuration mapping task categories to models: lightweight tasks to small models (GPT-4o mini, Claude Haiku, Llama 3 8B), moderate tasks to mid-tier models, and complex tasks to frontier models. Evaluate tier assignments using offline benchmarks and continuous production quality scores. Log model-tier decisions with task metadata to enable ongoing optimization.",
+          },
+          {
+            id: "cost-orch-2",
+            text: "Enforce per-workflow and per-agent token budgets with graceful degradation on exhaustion",
+            exec:
+              "Runaway agent loops, excessive tool-calling chains, and open-ended reasoning steps can consume orders of magnitude more tokens than intended. Without per-workflow budget caps, a single pathological request can consume an entire tenant's daily allocation. Budget enforcement at the orchestration layer prevents cost blowouts before they reach the gateway.",
+            eng:
+              "Assign a token budget to each workflow invocation based on workflow type and tenant tier. Track cumulative token consumption across all LLM calls within the workflow. At 80% budget consumption, trigger a summarize-and-compress step that condenses the conversation context. At 100%, halt further LLM calls and return the best available partial result with a budget-exhaustion notice. Emit budget-consumption metrics per workflow for capacity planning and budget calibration.",
+          },
+          {
+            id: "cost-orch-3",
+            text: "Optimize orchestration topology for cost — prefer parallel fan-out over sequential chains when quality is equivalent",
+            exec:
+              "Sequential multi-agent chains accumulate context at each step, causing later agents to process all previous agents' outputs as input tokens. Parallel fan-out with result aggregation keeps each agent's context window lean. For workflows where agent ordering doesn't matter, parallelization reduces total token consumption in addition to reducing latency.",
+            eng:
+              "Analyze workflow DAGs to identify steps that can execute in parallel without data dependencies. For parallel branches, provide each agent only the context it needs — not the accumulated history of sibling branches. Implement a lightweight aggregation step that combines parallel results. Compare sequential vs. parallel token consumption per workflow type and enforce the more efficient topology in the orchestration configuration.",
+          },
+          {
+            id: "cost-orch-4",
+            text: "Implement prompt optimization — compress system prompts and few-shot examples to minimize per-request input token overhead",
+            exec:
+              "System prompts and few-shot examples are repeated on every LLM call and often account for 60-80% of input tokens in agentic workloads. A 1,000-token reduction in the system prompt across 100,000 daily requests saves 100 million input tokens per day — a material cost reduction that requires no quality tradeoff when done carefully.",
+            eng:
+              "Audit all system prompts for redundancy, verbosity, and unused instructions. Apply prompt compression techniques: remove filler language, use structured formats (YAML/JSON) instead of prose for tool definitions, and replace verbose few-shot examples with concise ones. Measure quality impact using the evaluation pipeline before and after compression. Automate prompt-token-count tracking and alert when prompt size regresses. Consider prompt-compression models (LLMLingua, selective context) for dynamic context that cannot be manually optimized.",
+          },
+        ],
+      },
+
+      /* ── Runtime (moderate) ──────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "cost-rt-1",
+            text: "Right-size context windows — send only the context each inference call actually needs",
+            exec:
+              "LLM pricing scales with token count, and many implementations naively pass the full conversation history and all retrieved documents to every call. Right-sizing the context window — sending only relevant history, selected retrieval chunks, and necessary tool outputs — directly reduces input token costs without quality degradation for focused tasks.",
+            eng:
+              "Implement context-selection logic that filters conversation history to the most relevant turns for each call (sliding window, topic-relevance scoring, or summarization of older turns). For RAG-augmented calls, limit retrieved chunks to the top-k most relevant and set k based on task complexity. Strip tool-call results from history when they are no longer relevant to the current reasoning step. Monitor context-window utilization per model call and alert when average utilization exceeds 70% of the model's maximum — a sign that context management needs optimization.",
+          },
+          {
+            id: "cost-rt-2",
+            text: "Leverage batch inference for non-interactive workloads to reduce per-token cost",
+            exec:
+              "Batch inference APIs (OpenAI Batch API, Anthropic Message Batches) offer 50% cost discounts by trading latency for throughput. Workloads that are not latency-sensitive — nightly evaluations, bulk classification, document processing, scheduled summarization — should always use batch endpoints rather than real-time inference.",
+            eng:
+              "Identify all non-interactive LLM workloads: evaluation pipelines, data enrichment jobs, report generation, embedding computation, and scheduled summarization. Route these through a batch-processing queue that accumulates requests and submits them to batch inference endpoints. Set batch SLOs (e.g., complete within 24 hours) rather than real-time latency targets. Track batch vs. real-time cost split as a key FinOps metric — the ratio indicates optimization headroom.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ──────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "cost-gw-1",
+            text: "Implement prompt caching at the gateway to eliminate redundant processing of repeated prefixes",
+            exec:
+              "Agentic platforms repeat identical system prompts, tool definitions, and few-shot examples across thousands of requests. Prompt caching — supported natively by Anthropic (cache_control breakpoints) and via prefix caching by other providers — reduces input token costs by up to 90% for the cached prefix and cuts time-to-first-token by up to 85%. The gateway is the natural enforcement point for cache-aware request routing.",
+            eng:
+              "Structure all LLM requests with stable prefixes (system prompt, tool definitions, few-shot examples) followed by variable content (user message, retrieved context). Enable provider-native prompt caching where available (Anthropic cache_control headers, OpenAI automatic prefix caching). At the gateway, route requests with identical prefixes to the same provider endpoint to maximize cache hit rates. Monitor cache hit ratio per model and per tenant — target >80% hit rate for system-prompt prefixes. Alert on cache-miss spikes that indicate prompt instability or routing misconfiguration.",
+          },
+          {
+            id: "cost-gw-2",
+            text: "Deploy semantic caching to serve repeated and near-duplicate queries from cache without LLM inference",
+            exec:
+              "Many user queries to agentic systems are semantically identical or near-duplicates — rephrased questions, repeated lookups, and common support requests. Semantic caching uses embedding similarity to match incoming queries against cached responses, serving cache hits without any LLM inference. For platforms with repetitive query patterns, semantic caching can eliminate 20-40% of inference calls.",
+            eng:
+              "Deploy an embedding-based semantic cache layer at the gateway. On each request, compute the embedding of the user query and search the cache for entries above a configurable similarity threshold (start at 0.95 cosine similarity). On cache hit, return the cached response with a cache-hit indicator. On cache miss, forward to the LLM, cache the response keyed by the query embedding. Implement TTL-based and event-based cache invalidation to prevent serving stale responses. Partition the cache by tenant and model to avoid cross-contamination. Track cache hit rate, latency savings, and cost avoidance as primary KPIs.",
+          },
+          {
+            id: "cost-gw-3",
+            text: "Implement real-time cost attribution and per-tenant budget enforcement at the gateway",
+            exec:
+              "The LLM gateway is the single metering point for all model traffic. Every token passes through it, making it the authoritative source for cost attribution, budget enforcement, and usage-based billing. Without gateway-level cost controls, budget enforcement depends on after-the-fact reconciliation that cannot prevent overruns.",
+            eng:
+              "Compute per-request cost on every gateway response using token counts from the provider response and a maintained pricing table per model. Tag costs with tenant ID, agent role, workflow ID, and task type. Enforce per-tenant budget limits in real-time: soft limits trigger alerts and degrade to cheaper models, hard limits reject requests with a budget-exhausted error. Aggregate costs into hourly and daily rollups for showback dashboards. Reconcile gateway-computed costs against provider invoices monthly to detect metering drift.",
+          },
+          {
+            id: "cost-gw-4",
+            text: "Route traffic across providers to optimize cost-quality tradeoffs and leverage competitive pricing",
+            exec:
+              "LLM providers offer different price-performance profiles that change frequently. A gateway locked to a single provider cannot capitalize on pricing competition, promotional tiers, or provider-specific strengths. Multi-provider routing enables cost arbitrage — sending traffic to the provider offering the best price for equivalent quality on each task type.",
+            eng:
+              "Maintain a provider-model matrix at the gateway with per-model pricing, latency profiles, and quality scores from the evaluation pipeline. Implement routing rules that select the optimal provider for each request based on task type, quality requirements, and current pricing. Support fallback routing that cascades to cheaper alternatives when primary providers are rate-limited or degraded. Track per-provider cost efficiency (quality per dollar) and update routing weights based on production evaluation data. Alert on pricing changes that shift optimal routing configuration.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "cost-tool-1",
+            text: "Cache tool-call results to avoid redundant external API calls and the LLM tokens spent processing duplicate outputs",
+            exec:
+              "Agents frequently invoke the same tool with identical or near-identical parameters within a single workflow or across workflows — repeated database lookups, API queries, and search operations. Each redundant tool call wastes both the external API cost and the LLM tokens consumed when the agent processes the duplicate result. Tool-result caching addresses both cost vectors.",
+            eng:
+              "Implement a tool-result cache keyed by tool identifier and normalized input parameters. Set per-tool TTLs based on data freshness requirements — real-time data (stock prices) gets short TTLs (seconds), reference data (product catalogs) gets longer TTLs (hours). For tools with side effects (write operations), cache only read operations. Monitor cache hit rates per tool and track combined savings from avoided API calls and avoided LLM token processing.",
+          },
+          {
+            id: "cost-tool-2",
+            text: "Optimize tool output formatting to minimize tokens consumed when the LLM processes tool results",
+            exec:
+              "Tool outputs are injected into the LLM context as tokens. Verbose tool responses — full JSON API payloads, unfiltered database result sets, raw HTML — inflate input token costs on the subsequent LLM call. Compressing tool outputs to include only the fields the agent actually needs can reduce per-tool-call token consumption by 50-80%.",
+            eng:
+              "Implement response-shaping middleware on tool outputs that extracts only the fields relevant to the agent's task. Define per-tool output schemas that specify which fields to include, maximum array lengths, and truncation rules for long text fields. Apply output compression before injecting tool results into the agent context. Track per-tool token contribution to the context window and flag tools whose outputs consistently exceed a configurable threshold.",
+          },
+        ],
+      },
+
+      /* ── Memory (moderate) ───────────────────────── */
+      {
+        layerId: "memory",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "cost-mem-1",
+            text: "Optimize embedding operations — batch embedding requests, cache embeddings, and right-size embedding models",
+            exec:
+              "Embedding computation is a secondary but significant cost in RAG-heavy agentic systems. Real-time per-query embedding, re-embedding unchanged documents, and using high-dimensional models for simple retrieval tasks all waste compute and API cost. Embedding optimization compounds over millions of daily operations.",
+            eng:
+              "Batch embedding requests during document ingestion rather than embedding one-at-a-time. Cache query embeddings for repeated or similar queries using the semantic cache at the gateway layer. Use smaller, cheaper embedding models (e.g., text-embedding-3-small vs. text-embedding-3-large) when retrieval quality benchmarks show equivalent recall. Implement incremental re-embedding that only processes changed documents. Track embedding cost as a separate line item in the FinOps dashboard.",
+          },
+          {
+            id: "cost-mem-2",
+            text: "Implement retrieval-budget controls to limit the number of chunks injected into LLM context",
+            exec:
+              "Over-retrieval — fetching too many chunks from the vector store and injecting all of them into the LLM context — is a common cost amplifier. Each additional chunk increases input tokens on every subsequent LLM call in the workflow. Retrieval budgets cap the token cost of grounding without requiring changes to the retrieval pipeline itself.",
+            eng:
+              "Set a per-query retrieval budget in tokens (not just chunk count, since chunk sizes vary). Implement a reranker that scores retrieved chunks by relevance and selects the top chunks that fit within the token budget. Track average retrieval-token-to-context-token ratio per workflow type — this ratio indicates how much of the context window is consumed by retrieval vs. conversation history. Alert when retrieval token consumption exceeds budget thresholds.",
+          },
+        ],
+      },
+
+      /* ── State (minimal) ─────────────────────────── */
+      {
+        layerId: "state",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "cost-st-1",
+            text: "Implement conversation-state compression to reduce checkpoint storage costs and context-reload token costs",
+            exec:
+              "Long-running agent workflows accumulate large conversation states that are checkpointed for durability. When a workflow resumes from a checkpoint, the full state is reloaded into the LLM context as input tokens. Compressing stored state — summarizing older turns, pruning resolved sub-tasks — reduces both storage costs and the token cost of resumption.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Observability (moderate) ──────────────────── */
+      {
+        layerId: "observability",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "cost-obs-1",
+            text: "Build FinOps dashboards that track AI unit economics — cost per conversation, cost per task completion, and cost per tenant",
+            exec:
+              "Raw token spend is meaningless without business context. FinOps for AI requires unit economics that connect infrastructure costs to business outcomes: cost per successful task completion, cost per conversation, cost per active tenant, and cost trend by workflow type. These metrics enable product teams to price AI features, engineering to prioritize optimizations, and finance to forecast spend.",
+            eng:
+              "Aggregate gateway cost data with workflow-completion telemetry to compute unit economics: total cost / successful completions = cost per task. Break down by dimensions: tenant, workflow type, model tier, and time period. Display on dashboards with trend lines, anomaly detection, and drill-down to individual expensive workflows. Compare unit costs across model-tier configurations to quantify optimization impact. Publish weekly FinOps reports to engineering, product, and finance stakeholders.",
+          },
+          {
+            id: "cost-obs-2",
+            text: "Implement cost anomaly detection that alerts on spend spikes before they exhaust budgets",
+            exec:
+              "AI workload costs can spike suddenly — a prompt regression that doubles token usage, a retry loop that multiplies calls, or a traffic surge from a new integration. After-the-fact invoice review catches these too late. Real-time cost anomaly detection using statistical baselines is the early-warning system that prevents budget blowouts.",
+            eng:
+              "Compute rolling cost baselines per tenant, per workflow type, and per model on hourly and daily windows. Apply anomaly detection (z-score, IQR, or ML-based) to detect deviations exceeding configurable thresholds (e.g., >2x baseline). Alert immediately on anomalies with context: affected tenant, workflow, model, token breakdown (input vs. output), and comparison to baseline. Integrate cost anomaly alerts with the orchestration circuit-breaker to enable automated mitigation — throttle or downgrade affected workflows until the anomaly is investigated.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ───────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "cost-gov-1",
+            text: "Establish a FinOps practice for AI with defined roles, cadences, and cost-accountability structures",
+            exec:
+              "AI cost management cannot be an ad-hoc engineering activity. Without a formal FinOps practice — with defined roles (FinOps practitioner, engineering leads, finance), regular review cadences, and clear cost-accountability chains — optimization efforts are sporadic and savings are not sustained. The FinOps Foundation's AI cost management framework provides a maturity model for building this capability.",
+            eng:
+              "Assign a FinOps practitioner or team responsible for AI cost visibility, optimization, and governance. Establish cadences: daily automated anomaly checks, weekly engineering cost reviews, monthly cross-functional business reviews. Define cost-accountability: each team owns the cost of their agents and workflows, with showback dashboards providing transparency. Track optimization initiatives with before/after metrics. Report AI unit economics alongside traditional cloud FinOps metrics.",
+          },
+          {
+            id: "cost-gov-2",
+            text: "Define and enforce cost governance policies — model-usage policies, budget hierarchies, and approval workflows for high-cost operations",
+            exec:
+              "Without governance policies, any engineer can deploy an agent that routes all traffic to the most expensive model, any workflow can consume unlimited tokens, and cost optimization depends entirely on individual discipline. Policy-based governance makes cost efficiency systemic rather than heroic.",
+            eng:
+              "Define model-usage policies that specify which model tiers are approved for which task categories — prevent frontier-model use for tasks where mid-tier models meet quality requirements. Implement budget hierarchies: organization → department → team → workflow, with each level inheriting and subdividing the parent budget. Require approval workflows for deploying new agents or workflows that exceed per-request cost thresholds. Enforce policies through gateway configuration and orchestration rules, not just documentation. Audit policy compliance monthly.",
+          },
+          {
+            id: "cost-gov-3",
+            text: "Implement chargeback or showback for AI costs to drive cost-conscious behavior across teams",
+            exec:
+              "When AI costs are pooled into a central budget with no team-level attribution, there is no incentive for product teams to optimize their agents' token consumption, choose efficient model tiers, or invest in caching. Showback (visibility) or chargeback (actual cost allocation) creates the economic signal that drives cost-conscious design decisions at the team level.",
+            eng:
+              "Implement showback as a first step: attribute all AI costs to teams, products, and tenants based on gateway metering data. Publish per-team cost reports with trend analysis and peer benchmarking (team A's cost per task vs. team B's for similar workflows). Graduate to chargeback when the attribution model is mature — allocate actual provider invoice costs proportionally based on metered usage. Provide teams with self-service cost dashboards and optimization recommendations based on their usage patterns.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (minimal) ───────────────── */
+      {
+        layerId: "systems",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "cost-sys-1",
+            text: "Account for system-of-record API costs in the total cost of agent workflows that invoke external integrations",
+            exec:
+              "Agent workflows that call external systems (CRMs, ERPs, payment processors) incur API costs beyond LLM inference — per-call fees, data-transfer charges, and rate-limit-based pricing tiers. Excluding these from cost attribution understates the true cost of agent operations and misaligns optimization incentives.",
+            eng: "",
+          },
+        ],
+      },
+    ],
+  },
+
 ];
