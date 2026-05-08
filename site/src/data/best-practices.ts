@@ -465,7 +465,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "The EU AI Act (Article 50) and OECD Transparency Principle require that users know when they are interacting with an AI system. Failure to disclose creates regulatory liability and erodes user trust.",
             eng:
-              "Render a persistent AI disclosure badge on all agent-driven interfaces. Include a link to the system's AI transparency card describing model capabilities, limitations, and data usage. Log user acknowledgment events for compliance evidence.",
+              "Render a persistent AI disclosure badge on all agent-driven interfaces. Include a link to the system’s AI transparency card describing model capabilities, limitations, and data usage. Log user acknowledgment events for compliance evidence.",
           },
           {
             id: "gov-surf-2",
@@ -473,7 +473,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "OECD Principle 1.4 (Human Agency) and ISO 42001 Clause 8.4 require that humans can override AI decisions. Surface-layer controls make this right actionable rather than theoretical.",
             eng:
-              "Implement a visible 'escalate to human' control on every agent interaction. Allow users to reject, modify, or request re-evaluation of AI-generated outputs. Record all override events with the original AI recommendation for audit comparison.",
+              "Implement a visible ‘escalate to human’ control on every agent interaction. Allow users to reject, modify, or request re-evaluation of AI-generated outputs. Record all override events with the original AI recommendation for audit comparison.",
           },
         ],
       },
@@ -497,7 +497,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "Different agent roles carry different risk profiles. An agent that reads data has a fundamentally different governance posture than one that initiates financial transactions. Policies must reflect this stratification.",
             eng:
-              "Map agent roles to EU AI Act risk tiers (high, limited, minimal) and apply corresponding governance controls — high-risk agents require human oversight, conformity assessments, and enhanced logging. Enforce these mappings through the identity layer's policy engine.",
+              "Map agent roles to EU AI Act risk tiers (high, limited, minimal) and apply corresponding governance controls — high-risk agents require human oversight, conformity assessments, and enhanced logging. Enforce these mappings through the identity layer’s policy engine.",
           },
         ],
       },
@@ -519,7 +519,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-orch-2",
             text: "Record complete decision lineage for every orchestration decision",
             exec:
-              "NIST AI RMF GOVERN 1.5 requires traceability of AI decisions. Orchestration is where the model's reasoning becomes action — the decision lineage here is the backbone of any regulatory audit.",
+              "NIST AI RMF GOVERN 1.5 requires traceability of AI decisions. Orchestration is where the model’s reasoning becomes action — the decision lineage here is the backbone of any regulatory audit.",
             eng:
               "Capture and persist the full decision chain: input context, model reasoning (chain-of-thought), selected plan, rejected alternatives, and approval status. Store in an append-only audit store with cryptographic integrity. Make lineage queryable by agent ID, time range, and decision type.",
           },
@@ -553,7 +553,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "ISO 42001 Clause 8.3 requires controlled deployment of AI components. No model should reach production without passing through a documented approval process that validates fitness, bias testing, and regulatory compliance.",
             eng:
-              "Implement a model registry with lifecycle states (draft, approved, deployed, deprecated, retired). Block runtime loading of models not in 'approved' or 'deployed' state. Require sign-off from both engineering and compliance before state transitions. Log all model version changes.",
+              "Implement a model registry with lifecycle states (draft, approved, deployed, deprecated, retired). Block runtime loading of models not in ‘approved’ or ‘deployed’ state. Require sign-off from both engineering and compliance before state transitions. Log all model version changes.",
           },
           {
             id: "gov-rt-2",
@@ -577,7 +577,7 @@ export const PILLARS: Pillar[] = [
             exec:
               "GDPR, the EU AI Act, and sector regulations mandate that certain data categories are processed only within specific jurisdictions. The runtime must enforce these constraints or the entire governance framework is undermined.",
             eng:
-              "Tag each runtime environment with its geographic region and data-classification clearance. Implement a pre-dispatch check that validates the request's data classification against the target runtime's clearance. Reject and re-route requests that violate residency rules. Log all routing decisions.",
+              "Tag each runtime environment with its geographic region and data-classification clearance. Implement a pre-dispatch check that validates the request’s data classification against the target runtime’s clearance. Reject and re-route requests that violate residency rules. Log all routing decisions.",
           },
         ],
       },
@@ -591,9 +591,9 @@ export const PILLARS: Pillar[] = [
             id: "gov-gw-1",
             text: "Enforce responsible-use policies at the model gateway",
             exec:
-              "The gateway is the single chokepoint for all model interactions. Microsoft's Responsible AI Standard v2 requires that AI systems include mechanisms to prevent misuse. Gateway-level enforcement ensures no request bypasses responsible-use policies.",
+              "The gateway is the single chokepoint for all model interactions. Microsoft’s Responsible AI Standard v2 requires that AI systems include mechanisms to prevent misuse. Gateway-level enforcement ensures no request bypasses responsible-use policies.",
             eng:
-              "Deploy a policy enforcement layer at the gateway that evaluates every request against the organization's responsible-use policy: blocked use cases, required disclaimers, mandatory content safety checks, and prohibited prompt patterns. Return structured denial responses with policy references when requests are blocked.",
+              "Deploy a policy enforcement layer at the gateway that evaluates every request against the organization’s responsible-use policy: blocked use cases, required disclaimers, mandatory content safety checks, and prohibited prompt patterns. Return structured denial responses with policy references when requests are blocked.",
           },
           {
             id: "gov-gw-2",
@@ -607,7 +607,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-gw-3",
             text: "Maintain a model catalog with risk classifications and approved-use boundaries",
             exec:
-              "NIST AI RMF GOVERN 1.2 requires an inventory of AI systems with associated risks. The gateway's model catalog serves as the operational manifestation of this inventory, controlling which models can be used for which purposes.",
+              "NIST AI RMF GOVERN 1.2 requires an inventory of AI systems with associated risks. The gateway’s model catalog serves as the operational manifestation of this inventory, controlling which models can be used for which purposes.",
             eng:
               "Maintain a gateway-accessible model catalog recording: model ID, provider, risk classification, approved use cases, prohibited use cases, maximum context window, and data-classification clearance. Reject requests that route to a model outside its approved-use boundary. Sync the catalog with the enterprise AI inventory.",
           },
@@ -623,7 +623,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-tool-1",
             text: "Maintain a governed tool registry with risk classifications and approval status",
             exec:
-              "Every tool an agent can invoke extends the system's impact surface. ISO 42001 Clause 8.2 requires documented operational procedures. A governed tool registry ensures no unapproved capability enters production.",
+              "Every tool an agent can invoke extends the system’s impact surface. ISO 42001 Clause 8.2 requires documented operational procedures. A governed tool registry ensures no unapproved capability enters production.",
             eng:
               "Create a tool registry recording: tool ID, description, risk tier, data access scope, approved agent roles, and last review date. Enforce registry enrollment as a prerequisite for tool availability at runtime. Trigger re-review when tools are modified or their access scope changes.",
           },
@@ -631,7 +631,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-tool-2",
             text: "Require impact assessments for tools that modify external systems",
             exec:
-              "Tools that write data, trigger workflows, or communicate externally carry higher governance burden than read-only tools. The EU AI Act's conformity assessment requirements extend to the systems AI interacts with, not just the AI itself.",
+              "Tools that write data, trigger workflows, or communicate externally carry higher governance burden than read-only tools. The EU AI Act’s conformity assessment requirements extend to the systems AI interacts with, not just the AI itself.",
             eng:
               "Classify tools as read-only, state-modifying, or externally-communicating. Require a documented impact assessment for state-modifying and external tools covering: data affected, reversibility, maximum blast radius, and required human oversight level. Store assessments alongside the tool registry entry.",
           },
@@ -671,7 +671,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-st-1",
             text: "Ensure agent checkpoint state supports reproducibility for regulatory review",
             exec:
-              "EU AI Act Article 12 and NIST AI RMF GOVERN 1.5 require that high-risk AI decisions are reproducible for audit purposes. Checkpoint state must be sufficient to recreate the agent's decision context at any historical point.",
+              "EU AI Act Article 12 and NIST AI RMF GOVERN 1.5 require that high-risk AI decisions are reproducible for audit purposes. Checkpoint state must be sufficient to recreate the agent’s decision context at any historical point.",
             eng: "",
           },
         ],
@@ -742,7 +742,7 @@ export const PILLARS: Pillar[] = [
             id: "gov-gov-3",
             text: "Define and enforce RACI accountability structures for all AI agent operations",
             exec:
-              "NIST AI RMF GOVERN 1.1 and ISO 42001 Clause 5.3 require clearly defined roles and responsibilities for AI systems. Without explicit RACI mappings, accountability defaults to 'nobody' when incidents occur.",
+              "NIST AI RMF GOVERN 1.1 and ISO 42001 Clause 5.3 require clearly defined roles and responsibilities for AI systems. Without explicit RACI mappings, accountability defaults to ‘nobody’ when incidents occur.",
             eng:
               "Create RACI matrices linking each agent role, data domain, and decision type to specific human roles (Responsible, Accountable, Consulted, Informed). Embed RACI references in agent metadata. Surface accountability chains in the governance dashboard. Require RACI assignment as a pre-deployment gate.",
           },
@@ -785,6 +785,353 @@ export const PILLARS: Pillar[] = [
               "OECD Principle 1.3 (Transparency and Explainability) requires that AI-driven actions on business-critical systems can be traced and explained. Irreversible, unattributed changes undermine trust and regulatory defensibility.",
             eng:
               "Require all agent-initiated writes to external systems to carry a governance metadata envelope: agent ID, authorization chain, decision rationale, and rollback instructions. Implement compensating transactions or soft-delete patterns for reversibility. Surface agent-initiated change reports in the governance dashboard.",
+          },
+        ],
+      },
+    ],
+  },
+
+  /* ================================================================ */
+  /*  PILLAR 3 — AI Factory (MLOps / LLMOps)                         */
+  /* ================================================================ */
+  {
+    id: "ai-factory",
+    name: "AI Factory (MLOps / LLMOps)",
+    icon: "⚙",
+    exec:
+      "Agentic AI platforms depend on a continuous lifecycle of model development, evaluation, deployment, and monitoring that extends well beyond traditional software CI/CD. Without disciplined MLOps and LLMOps practices — model registries, evaluation pipelines, prompt versioning, drift detection, and embedding management — organizations ship brittle AI that degrades silently in production. The AI Factory pillar establishes the engineering discipline that turns experimental models into reliable, versioned, observable production assets across every architecture layer.",
+    eng:
+      "Treat models, prompts, and embeddings as first-class versioned artifacts with full lineage tracking. Implement evaluation-driven development where no model or prompt change reaches production without passing automated benchmark suites, red-team tests, and regression checks. Build continuous training and fine-tuning pipelines with reproducible data lineage. Deploy models using canary and blue-green strategies with automated rollback on metric degradation. Monitor for concept drift, data drift, and performance decay with statistical tests that trigger retraining or human review.",
+    citations: [
+      {
+        id: "google-mlops",
+        label: "Practitioners Guide to MLOps — Google Cloud",
+        url: "https://services.google.com/fh/files/misc/practitioners_guide_to_mlops_whitepaper.pdf",
+        org: "Google",
+      },
+      {
+        id: "azure-mlops-waf",
+        label: "Azure Well-Architected Framework — MLOps for Machine Learning",
+        url: "https://learn.microsoft.com/en-us/azure/well-architected/ai/mlops-machine-learning",
+        org: "Microsoft",
+      },
+      {
+        id: "cncf-cloud-native-ai",
+        label: "CNCF Cloud Native Artificial Intelligence Whitepaper",
+        url: "https://www.cncf.io/reports/cloud-native-artificial-intelligence-whitepaper/",
+        org: "CNCF",
+      },
+      {
+        id: "hf-model-cards",
+        label: "Hugging Face Model Cards Documentation",
+        url: "https://huggingface.co/docs/hub/en/model-cards",
+        org: "Hugging Face",
+      },
+      {
+        id: "mlflow-model-registry",
+        label: "MLflow Model Registry — Centralized Model Lifecycle Management",
+        url: "https://mlflow.org/docs/latest/model-registry.html",
+        org: "MLflow / Linux Foundation",
+      },
+    ],
+    cells: [
+      /* ── Surface (minimal) ──────────────────────────────── */
+      {
+        layerId: "surface",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "fac-surf-1",
+            text: "Expose model version and evaluation metadata in user-facing responses",
+            exec:
+              "Users and support teams need to correlate AI behavior with specific model versions. Surfacing model lineage metadata in responses enables rapid triage when output quality shifts after a deployment.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Identity (minimal) ─────────────────────────────── */
+      {
+        layerId: "identity",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "fac-id-1",
+            text: "Bind model deployment approvals to identity-scoped authorization gates",
+            exec:
+              "Model promotion from staging to production is a high-impact action. Tying deployment approval to verified human identities with RBAC ensures accountability and prevents unauthorized model pushes.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Orchestration (moderate) ───────────────────────── */
+      {
+        layerId: "orchestration",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "fac-orch-1",
+            text: "Version and test orchestration prompt templates as part of the CI/CD pipeline",
+            exec:
+              "Prompt templates are code. Unversioned prompt changes silently alter agent behavior and make regressions impossible to diagnose. Treating prompts as versioned, tested artifacts prevents drift between intended and actual orchestration logic.",
+            eng:
+              "Store prompt templates in source control alongside application code. Assign semantic versions on every change. Run evaluation suites (exact-match, LLM-as-judge, human-preference) against a golden dataset before merging. Tag deployed prompt versions in the model gateway for traceability.",
+          },
+          {
+            id: "fac-orch-2",
+            text: "Implement evaluation-driven development for agent plan generation",
+            exec:
+              "Orchestration quality is measurable. Without systematic evaluation of plan correctness, tool-selection accuracy, and task-completion rates, teams optimize blindly and regressions reach production undetected.",
+            eng:
+              "Build an evaluation harness that scores orchestration outputs against curated test scenarios covering happy paths, edge cases, and adversarial inputs. Track metrics (plan accuracy, tool-selection F1, end-to-end success rate) per prompt version. Gate deployments on regression thresholds.",
+          },
+        ],
+      },
+
+      /* ── Runtime (moderate) ─────────────────────────────── */
+      {
+        layerId: "runtime",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "fac-rt-1",
+            text: "Deploy model updates using canary and blue-green strategies with automated rollback",
+            exec:
+              "Model deployments carry inherent risk — fine-tuning regressions, quantization artifacts, and distribution shifts can degrade quality in ways unit tests miss. Progressive rollout with automated rollback limits blast radius to a fraction of traffic.",
+            eng:
+              "Implement canary deployments that route a configurable traffic percentage (start at 5%) to the new model version. Monitor key metrics (latency, error rate, evaluation scores, user satisfaction signals) against the baseline. Auto-rollback if degradation exceeds thresholds. Promote to 100% only after statistical significance is reached.",
+          },
+          {
+            id: "fac-rt-2",
+            text: "Enforce model resource quotas and hardware affinity at the runtime scheduler",
+            exec:
+              "LLMs and fine-tuned models have heterogeneous compute requirements — GPU memory, batch size limits, quantization constraints. The runtime must schedule model workloads to appropriate hardware or inference fails unpredictably.",
+            eng:
+              "Tag model artifacts with resource requirements (GPU type, VRAM, quantization level). Configure the runtime scheduler (Kubernetes with GPU operator, or managed inference endpoints) to match models to compatible hardware. Set per-model concurrency limits to prevent memory exhaustion. Alert when resource utilization exceeds 80%.",
+          },
+        ],
+      },
+
+      /* ── Gateway (critical) ─────────────────────────────── */
+      {
+        layerId: "gateway",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "fac-gw-1",
+            text: "Operate a centralized model registry with lifecycle states and approval gates",
+            exec:
+              "A model registry is the single source of truth for which models exist, their lineage, evaluation results, and deployment status. Without one, teams deploy ad-hoc model files with no provenance, versioning, or rollback capability — the ML equivalent of deploying untracked binaries to production.",
+            eng:
+              "Deploy a model registry (MLflow, Azure ML Model Registry, or Vertex AI Model Registry) with enforced lifecycle states: Registered, Validated, Approved, Deployed, Deprecated, Archived. Require automated evaluation gate passage and human sign-off before Approved state. Store model artifacts with cryptographic hashes, training run links, dataset versions, and evaluation metrics. Block deployment of models not in Approved state.",
+          },
+          {
+            id: "fac-gw-2",
+            text: "Implement LLM-specific CI/CD with prompt testing and evaluation suites",
+            exec:
+              "Traditional CI/CD validates code correctness with deterministic tests. LLM-based systems require probabilistic evaluation — prompt regression tests, benchmark suites, red-team adversarial tests, and LLM-as-judge scoring — integrated into the deployment pipeline to catch quality regressions before production.",
+            eng:
+              "Build a CI pipeline that runs on every prompt or model change: (1) unit-level prompt tests with expected output patterns, (2) benchmark evaluation against domain-specific datasets, (3) red-team test suites for adversarial robustness, (4) LLM-as-judge scoring for open-ended quality. Set pass/fail thresholds per metric. Store all evaluation results with the model registry entry. Fail the pipeline if any metric regresses beyond the configured tolerance.",
+          },
+          {
+            id: "fac-gw-3",
+            text: "Route traffic across model versions using gateway-level A/B testing",
+            exec:
+              "Comparing model versions in production requires controlled experimentation at the gateway. Without A/B infrastructure, teams rely on offline evaluations that fail to capture real-world user behavior and edge cases.",
+            eng:
+              "Implement traffic-splitting at the model gateway that routes requests to model variants by percentage, user cohort, or feature flag. Collect per-variant metrics (latency, token usage, user feedback, task completion). Run statistical significance tests before declaring a winner. Integrate results back into the model registry as production evaluation evidence.",
+          },
+          {
+            id: "fac-gw-4",
+            text: "Track prompt and model version lineage across the full request lifecycle",
+            exec:
+              "When a production issue arises, teams need to answer: which model version, which prompt version, and which configuration produced this output? Without end-to-end lineage, debugging is guesswork and reproducibility is impossible.",
+            eng:
+              "Attach version metadata (model ID, model hash, prompt template version, inference config) to every gateway request as propagated headers. Log this lineage alongside the response. Enable querying historical requests by any lineage dimension. Link lineage records to the model registry and prompt version control system.",
+          },
+        ],
+      },
+
+      /* ── Tools (moderate) ───────────────────────────────── */
+      {
+        layerId: "tools",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "fac-tool-1",
+            text: "Version and evaluate tool-calling schemas alongside model and prompt changes",
+            exec:
+              "Tool schemas define the contract between the LLM and external capabilities. Schema changes can break tool invocation accuracy as severely as a model swap. They must be versioned, tested, and deployed with the same rigor as model artifacts.",
+            eng:
+              "Store tool schemas in the same version control as prompt templates. Include tool-calling accuracy in the evaluation suite — measure whether the model selects the correct tool, generates valid parameters, and handles tool errors gracefully. Gate deployments on tool-call regression thresholds.",
+          },
+          {
+            id: "fac-tool-2",
+            text: "Instrument tools to emit performance telemetry for model evaluation feedback loops",
+            exec:
+              "Tool execution outcomes are ground-truth signals for model quality. A model that generates syntactically valid but semantically wrong tool calls will only be caught if tool-level success and failure metrics flow back into the evaluation pipeline.",
+            eng:
+              "Emit structured telemetry from every tool execution: success/failure, latency, input parameters, output summary, and error classification. Feed tool success rates into model evaluation dashboards. Use tool failure patterns to generate regression test cases for the prompt evaluation suite.",
+          },
+        ],
+      },
+
+      /* ── Memory (critical) ──────────────────────────────── */
+      {
+        layerId: "memory",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "fac-mem-1",
+            text: "Manage embedding pipelines as versioned, reproducible ML artifacts",
+            exec:
+              "RAG quality depends entirely on embedding quality. Changing the embedding model, chunk strategy, or preprocessing pipeline without versioning and evaluation creates silent retrieval degradation that manifests as worse agent responses with no clear root cause.",
+            eng:
+              "Version the full embedding pipeline: embedding model ID, chunking strategy, preprocessing steps, and metadata extraction rules. Store pipeline configurations alongside the model registry. When any component changes, re-evaluate retrieval quality (precision@k, recall@k, MRR) against a golden query set before deploying the new index. Maintain rollback capability by retaining the previous index version.",
+          },
+          {
+            id: "fac-mem-2",
+            text: "Implement continuous retrieval quality monitoring with automated alerting",
+            exec:
+              "Embedding quality degrades over time as source documents change, user queries evolve, and embedding model behavior drifts. Without continuous monitoring, RAG pipelines silently return increasingly irrelevant context, degrading every downstream agent response.",
+            eng:
+              "Sample production retrieval queries and score relevance (using LLM-as-judge or human annotation) on a recurring schedule. Track retrieval precision, recall, and semantic similarity distributions. Alert when metrics drop below baseline thresholds. Trigger re-indexing or embedding model re-evaluation when degradation is confirmed.",
+          },
+          {
+            id: "fac-mem-3",
+            text: "Automate knowledge base ingestion with data quality validation gates",
+            exec:
+              "Garbage in, garbage out applies directly to RAG memory stores. Unvalidated document ingestion introduces stale, contradictory, or malformed content that pollutes retrieval results across the entire platform.",
+            eng:
+              "Build an automated ingestion pipeline with validation stages: format verification, deduplication, freshness checks (reject documents older than configured thresholds), content-quality scoring (readability, completeness), and conflict detection against existing indexed content. Log all rejected documents with rejection reasons. Run the pipeline on a schedule or trigger on source-system change events.",
+          },
+          {
+            id: "fac-mem-4",
+            text: "Track data lineage from source documents through embeddings to agent responses",
+            exec:
+              "When an agent produces a wrong answer sourced from RAG, teams must trace backward: which document, which chunk, which embedding version, and which retrieval query led to this output? Without lineage, root-cause analysis is impossible and the same failure repeats.",
+            eng:
+              "Assign unique IDs to source documents, chunks, and embedding versions. Propagate these IDs through the retrieval pipeline into the agent’s context window. Log the chunk IDs that contributed to each response alongside the model’s output. Enable querying: given a response, show the source documents; given a document, show all responses it influenced.",
+          },
+        ],
+      },
+
+      /* ── State (minimal) ────────────────────────────────── */
+      {
+        layerId: "state",
+        tier: "minimal",
+        guidelines: [
+          {
+            id: "fac-st-1",
+            text: "Persist experiment and training run metadata in agent checkpoint state",
+            exec:
+              "When fine-tuned or continuously-trained models serve agent workflows, the training provenance (dataset version, hyperparameters, evaluation scores) must be recoverable from the agent’s deployment state for reproducibility and audit.",
+            eng: "",
+          },
+        ],
+      },
+
+      /* ── Observability (critical) ───────────────────────── */
+      {
+        layerId: "observability",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "fac-obs-1",
+            text: "Implement statistical drift detection for model outputs and input distributions",
+            exec:
+              "Models degrade silently in production as user behavior shifts, data distributions change, and the world evolves past training data. Without drift detection, teams discover degradation only when users complain — weeks or months after quality declined.",
+            eng:
+              "Compute distributional statistics on model inputs (embedding centroid distance, token distribution) and outputs (response length distribution, confidence scores, refusal rates) using sliding windows. Apply statistical tests (PSI, KL divergence, KS test) against baseline distributions established at deployment time. Alert when drift exceeds configured thresholds. Integrate drift signals into the model registry as production health metadata.",
+          },
+          {
+            id: "fac-obs-2",
+            text: "Track model evaluation metrics continuously in production, not just at deploy time",
+            exec:
+              "Offline evaluation captures a snapshot. Production evaluation captures reality. Models that pass pre-deployment benchmarks can still fail on real-world distribution, adversarial inputs, or novel edge cases that the evaluation set did not cover.",
+            eng:
+              "Sample production requests and run them through the same evaluation pipeline used in CI/CD — LLM-as-judge scoring, factuality checks, tool-call accuracy, and user satisfaction proxies. Compute metrics on rolling windows (hourly, daily). Display production evaluation scores alongside deployment-time scores in the model registry. Trigger review when production scores diverge from deployment baselines.",
+          },
+          {
+            id: "fac-obs-3",
+            text: "Monitor cost-per-inference and token efficiency across model versions",
+            exec:
+              "AI inference cost scales with token consumption and model size. Without per-version cost tracking, teams cannot evaluate the cost-quality tradeoff of model upgrades, quantization strategies, or prompt optimizations.",
+            eng:
+              "Meter input and output tokens per request at the gateway and attribute costs to the specific model version, prompt version, and agent. Aggregate into cost dashboards showing cost-per-request, cost-per-successful-task, and cost trends over time. Compare cost efficiency across model versions. Alert on cost anomalies (e.g., a prompt change that doubles average token consumption).",
+          },
+          {
+            id: "fac-obs-4",
+            text: "Emit structured experiment-tracking telemetry for fine-tuning and retraining runs",
+            exec:
+              "Fine-tuning and continuous training produce dozens of experimental runs. Without structured experiment tracking, teams lose reproducibility, duplicate work, and cannot systematically identify the best-performing configuration.",
+            eng:
+              "Integrate experiment tracking (MLflow, Weights & Biases, or Azure ML Experiments) into all training pipelines. Log hyperparameters, dataset versions, training curves, evaluation metrics, and hardware utilization for every run. Link successful experiments to model registry entries. Enable comparison dashboards for selecting promotion candidates.",
+          },
+        ],
+      },
+
+      /* ── Governance (critical) ──────────────────────────── */
+      {
+        layerId: "governance",
+        tier: "critical",
+        guidelines: [
+          {
+            id: "fac-gov-1",
+            text: "Enforce model approval workflows with mandatory evaluation, bias testing, and sign-off",
+            exec:
+              "Deploying a model to production is a governed act. Without mandatory approval workflows — including automated evaluation, bias assessment, and human sign-off — organizations risk deploying undertested models that fail unpredictably or discriminate against protected groups.",
+            eng:
+              "Define a model promotion workflow: (1) automated evaluation suite must pass, (2) bias and fairness metrics must meet thresholds, (3) model card must be complete, (4) designated reviewer must approve. Enforce the workflow through the model registry lifecycle states. Block promotion to Deployed without all gates cleared. Log all approval decisions with reviewer identity and evaluation evidence.",
+          },
+          {
+            id: "fac-gov-2",
+            text: "Require model cards with standardized documentation for every production model",
+            exec:
+              "Model cards (per Hugging Face and Google’s framework) provide the minimum viable documentation for responsible model deployment: intended use, limitations, evaluation results, bias analysis, and training data provenance. Without them, downstream consumers operate blind.",
+            eng:
+              "Generate model cards automatically from training metadata and evaluation results. Require fields: model description, intended use cases, out-of-scope uses, training data summary, evaluation benchmarks with scores, known limitations, and ethical considerations. Store cards alongside model artifacts in the registry. Validate card completeness as a deployment gate.",
+          },
+          {
+            id: "fac-gov-3",
+            text: "Maintain full data lineage from training data through model to production predictions",
+            exec:
+              "Regulatory frameworks (EU AI Act Article 10, NIST AI RMF) require traceability of training data. When a model produces a harmful output, the organization must be able to trace back to the data that shaped that behavior. Data lineage is both a compliance requirement and a debugging necessity.",
+            eng:
+              "Track dataset versions, preprocessing transformations, and sampling strategies for every training run. Link training datasets to model registry entries. Record which production predictions were generated by which model trained on which data. Enable forward queries (given a dataset, which models were trained on it?) and backward queries (given a prediction, what data influenced the model?).",
+          },
+          {
+            id: "fac-gov-4",
+            text: "Establish retraining and deprecation policies for model lifecycle management",
+            exec:
+              "Models have shelf lives. Training data becomes stale, performance degrades via drift, and newer architectures outperform incumbents. Without explicit retraining schedules and deprecation policies, organizations accumulate technical debt in the form of unmaintained models serving production traffic.",
+            eng:
+              "Define maximum model age and minimum performance thresholds per use case. Automate retraining triggers based on drift alerts, performance degradation, or scheduled cadence. Implement a deprecation workflow: notify dependent teams, set a sunset date, migrate traffic, archive the model. Track model age and drift status in the governance dashboard.",
+          },
+        ],
+      },
+
+      /* ── Systems of Record (moderate) ───────────────────── */
+      {
+        layerId: "systems",
+        tier: "moderate",
+        guidelines: [
+          {
+            id: "fac-sys-1",
+            text: "Integrate feature stores with systems of record for consistent training and inference data",
+            exec:
+              "Training-serving skew — where the features used during training differ from those available at inference — is a top cause of production ML failures. A feature store that reads from the same systems of record for both training and serving eliminates this class of bug.",
+            eng:
+              "Deploy a feature store (Feast, Tecton, or Azure ML Feature Store) that materializes features from systems of record into both offline (training) and online (inference) stores. Ensure feature definitions are shared between training pipelines and serving endpoints. Monitor feature freshness and alert when online features lag offline by more than the configured SLA.",
+          },
+          {
+            id: "fac-sys-2",
+            text: "Validate data contracts between ML pipelines and upstream source systems",
+            exec:
+              "ML pipelines break when upstream systems change schemas, value distributions, or data availability without notice. Data contract validation catches these breaks at ingestion rather than surfacing as mysterious model degradation weeks later.",
+            eng:
+              "Define data contracts (Great Expectations, Soda, or Pydantic schemas) for every data source consumed by ML pipelines. Validate contracts on every pipeline run: schema checks, null rates, distribution bounds, freshness requirements. Fail pipelines early on contract violations. Notify both the ML team and the upstream data owner when contracts break.",
           },
         ],
       },
